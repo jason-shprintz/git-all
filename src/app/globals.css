@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0d1117;
+  --bg-surface: #161b22;
+  --bg-elevated: #1c2128;
+  --border: #30363d;
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+  --accent: #58a6ff;
+  --accent-hover: #79c0ff;
+
+  /* Contribution levels — GitHub-style greens */
+  --level-0: #161b22;
+  --level-1: #0e4429;
+  --level-2: #006d32;
+  --level-3: #26a641;
+  --level-4: #39d353;
+
+  /* GitLab-style oranges for side-by-side */
+  --gl-level-0: #161b22;
+  --gl-level-1: #4a2600;
+  --gl-level-2: #7a4100;
+  --gl-level-3: #c96800;
+  --gl-level-4: #fd9a28;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+}
