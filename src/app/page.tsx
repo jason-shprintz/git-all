@@ -63,7 +63,7 @@ export default function Home() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-12">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold tracking-tight mb-2">git-all</h1>
+        <h1 className="text-4xl font-bold tracking-tight mb-2">GitAll</h1>
         <p style={{ color: "var(--text-secondary)" }}>
           See GitHub &amp; GitLab contributions in one place.
         </p>
