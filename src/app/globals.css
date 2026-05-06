@@ -24,6 +24,13 @@
   --gl-level-2: #7a4100;
   --gl-level-3: #c96800;
   --gl-level-4: #fd9a28;
+
+  /* git-all integrated view — cyans */
+  --ga-level-0: #161b22;
+  --ga-level-1: #064e3b;
+  --ga-level-2: #0d9488;
+  --ga-level-3: #2dd4bf;
+  --ga-level-4: #5eead4;
 }
 
 body {

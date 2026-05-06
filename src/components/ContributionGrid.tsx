@@ -18,6 +18,9 @@ function getLevelColor(level: number, platform: string): string {
   if (platform === "gitlab") {
     return `var(--gl-level-${level})`;
   }
+  if (platform === "integrated") {
+    return `var(--ga-level-${level})`;
+  }
   return `var(--level-${level})`;
 }
 
