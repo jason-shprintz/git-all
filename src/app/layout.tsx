@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "git-all — Unified Contribution Heatmap",
-  description: "See your GitHub and GitLab contributions in one place.",
+  title: "GitAll — Unified Contribution Heatmap",
+  description: "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
 };
 
 export default function RootLayout({

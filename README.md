@@ -1,6 +1,8 @@
-# git-all
+# GitAll
 
-Unified contribution heatmap viewer for GitHub and GitLab. Enter usernames from either platform and see their contribution squares side-by-side or merged into a single integrated view.
+Unified contribution heatmap viewer for GitHub, GitLab, and more. Enter usernames from any supported platform and see their contribution squares side-by-side or merged into a single integrated view.
+
+**Live at [gitall.app](https://gitall.app)**
 
 ## Getting Started
 
@@ -44,3 +46,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Related
 
 - [git-contributions MCP service](https://github.com/jason-shprintz/mcp-services) — the MCP server counterpart for AI agents
+
+## Built by
+
+[Toastbyte Studios](https://toastbyte.studio)
