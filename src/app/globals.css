@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ── Dark theme (default) ──────────────────────────────────────────── */
 :root {
   --bg: #0d1117;
   --bg-surface: #161b22;
@@ -31,6 +32,101 @@
   --ga-level-2: #0d9488;
   --ga-level-3: #2dd4bf;
   --ga-level-4: #5eead4;
+}
+
+/* Manual light override */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-surface: #f6f8fa;
+  --bg-elevated: #ffffff;
+  --border: #d0d7de;
+  --text-primary: #1f2328;
+  --text-secondary: #656d76;
+  --text-muted: #8b949e;
+  --accent: #0969da;
+  --accent-hover: #0550ae;
+
+  --level-0: #ebedf0;
+  --level-1: #9be9a8;
+  --level-2: #40c463;
+  --level-3: #30a14e;
+  --level-4: #216e39;
+
+  --gl-level-0: #ebedf0;
+  --gl-level-1: #ffdfb2;
+  --gl-level-2: #f5a623;
+  --gl-level-3: #e08300;
+  --gl-level-4: #b35900;
+
+  --ga-level-0: #ebedf0;
+  --ga-level-1: #b2f0e8;
+  --ga-level-2: #2dd4bf;
+  --ga-level-3: #0d9488;
+  --ga-level-4: #0f766e;
+}
+
+/* Manual dark override */
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --bg-surface: #161b22;
+  --bg-elevated: #1c2128;
+  --border: #30363d;
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+  --accent: #58a6ff;
+  --accent-hover: #79c0ff;
+
+  --level-0: #161b22;
+  --level-1: #0e4429;
+  --level-2: #006d32;
+  --level-3: #26a641;
+  --level-4: #39d353;
+
+  --gl-level-0: #161b22;
+  --gl-level-1: #4a2600;
+  --gl-level-2: #7a4100;
+  --gl-level-3: #c96800;
+  --gl-level-4: #fd9a28;
+
+  --ga-level-0: #161b22;
+  --ga-level-1: #064e3b;
+  --ga-level-2: #0d9488;
+  --ga-level-3: #2dd4bf;
+  --ga-level-4: #5eead4;
+}
+
+/* System preference: light (when no manual choice has been set) */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #ffffff;
+    --bg-surface: #f6f8fa;
+    --bg-elevated: #ffffff;
+    --border: #d0d7de;
+    --text-primary: #1f2328;
+    --text-secondary: #656d76;
+    --text-muted: #8b949e;
+    --accent: #0969da;
+    --accent-hover: #0550ae;
+
+    --level-0: #ebedf0;
+    --level-1: #9be9a8;
+    --level-2: #40c463;
+    --level-3: #30a14e;
+    --level-4: #216e39;
+
+    --gl-level-0: #ebedf0;
+    --gl-level-1: #ffdfb2;
+    --gl-level-2: #f5a623;
+    --gl-level-3: #e08300;
+    --gl-level-4: #b35900;
+
+    --ga-level-0: #ebedf0;
+    --ga-level-1: #b2f0e8;
+    --ga-level-2: #2dd4bf;
+    --ga-level-3: #0d9488;
+    --ga-level-4: #0f766e;
+  }
 }
 
 body {
