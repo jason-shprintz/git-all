@@ -47,21 +47,21 @@
   --success: #3fb950;
 
   /* Contribution levels — GitHub-style greens */
-  --level-0: #161b22;
+  --level-0: #21262d;
   --level-1: #0e4429;
   --level-2: #006d32;
   --level-3: #26a641;
   --level-4: #39d353;
 
   /* GitLab-style oranges for side-by-side */
-  --gl-level-0: #161b22;
+  --gl-level-0: #21262d;
   --gl-level-1: #4a2600;
   --gl-level-2: #7a4100;
   --gl-level-3: #c96800;
   --gl-level-4: #fd9a28;
 
   /* git-all integrated view — cyans */
-  --ga-level-0: #161b22;
+  --ga-level-0: #21262d;
   --ga-level-1: #064e3b;
   --ga-level-2: #0d9488;
   --ga-level-3: #2dd4bf;
@@ -137,19 +137,19 @@
   --error: #f85149;
   --success: #3fb950;
 
-  --level-0: #161b22;
+  --level-0: #21262d;
   --level-1: #0e4429;
   --level-2: #006d32;
   --level-3: #26a641;
   --level-4: #39d353;
 
-  --gl-level-0: #161b22;
+  --gl-level-0: #21262d;
   --gl-level-1: #4a2600;
   --gl-level-2: #7a4100;
   --gl-level-3: #c96800;
   --gl-level-4: #fd9a28;
 
-  --ga-level-0: #161b22;
+  --ga-level-0: #21262d;
   --ga-level-1: #064e3b;
   --ga-level-2: #0d9488;
   --ga-level-3: #2dd4bf;
