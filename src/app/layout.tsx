@@ -5,7 +5,29 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "GitAll — Unified Contribution Heatmap",
-  description: "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
+  description:
+    "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
+  metadataBase: new URL("https://gitall.app"),
+  openGraph: {
+    title: "GitAll — Unified Contribution Heatmap",
+    description:
+      "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
+    url: "https://gitall.app",
+    siteName: "GitAll",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GitAll — Unified Contribution Heatmap",
+    description:
+      "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 /* Inline script injected before first paint to avoid flash of wrong theme */

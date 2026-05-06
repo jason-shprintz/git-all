@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- GitAll favicon: 3x3 grid of contribution squares -->
+  <!-- Row 1 -->
+  <rect x="2"  y="2"  width="8" height="8" rx="1.5" fill="#39d353"/>
+  <rect x="12" y="2"  width="8" height="8" rx="1.5" fill="#fd9a28"/>
+  <rect x="22" y="2"  width="8" height="8" rx="1.5" fill="#2dd4bf"/>
+  <!-- Row 2 -->
+  <rect x="2"  y="12" width="8" height="8" rx="1.5" fill="#fd9a28"/>
+  <rect x="12" y="12" width="8" height="8" rx="1.5" fill="#5eead4"/>
+  <rect x="22" y="12" width="8" height="8" rx="1.5" fill="#39d353"/>
+  <!-- Row 3 -->
+  <rect x="2"  y="22" width="8" height="8" rx="1.5" fill="#2dd4bf"/>
+  <rect x="12" y="22" width="8" height="8" rx="1.5" fill="#39d353"/>
+  <rect x="22" y="22" width="8" height="8" rx="1.5" fill="#fd9a28"/>
+</svg>
