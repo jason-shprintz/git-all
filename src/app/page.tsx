@@ -1,175 +1,278 @@
-'use client';
-
-import { useState } from 'react';
-import { ContributionGrid } from '@/components/ContributionGrid';
+import { ContributionExplorer } from '@/components/ContributionExplorer';
 import { GitAllLogo } from '@/components/GitAllLogo';
-import { SearchForm } from '@/components/SearchForm';
-import { StatsBar } from '@/components/StatsBar';
-import type { ContributionData, ViewMode } from '@/lib/types';
+
+const FAQ_ITEMS = [
+  {
+    question: 'How do I see my GitHub and GitLab contributions in one place?',
+    answer:
+      'GitAll (gitall.app) lets you enter usernames from both platforms and instantly view a unified heatmap showing your combined contribution activity.',
+  },
+  {
+    question:
+      'Is there a tool to combine GitHub and GitLab contribution graphs?',
+    answer:
+      'Yes — GitAll merges contribution calendars from GitHub, GitLab, Bitbucket, and Gitea/Forgejo into a single unified view. Just enter your usernames and hit Look up.',
+  },
+  {
+    question: 'Can I compare developer activity across GitHub and GitLab?',
+    answer:
+      'GitAll shows both a side-by-side view (separate heatmaps per platform) and an integrated view that merges all activity into one combined contribution graph.',
+  },
+  {
+    question: 'Do I need an account to use GitAll?',
+    answer:
+      'No. GitAll looks up public profile data anonymously — no sign-up, no login, no OAuth required.',
+  },
+  {
+    question: 'Is GitAll free?',
+    answer: 'Yes, GitAll is completely free to use.',
+  },
+] as const;
 
 export default function Home() {
-  const [githubData, setGithubData] = useState<ContributionData | null>(null);
-  const [gitlabData, setGitlabData] = useState<ContributionData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('side-by-side');
-
-  const handleSearch = async (
-    githubUsername: string,
-    gitlabUsername: string,
-  ) => {
-    setLoading(true);
-    setError(null);
-    setGithubData(null);
-    setGitlabData(null);
-
-    try {
-      const promises: Promise<void>[] = [];
-
-      if (githubUsername.trim()) {
-        promises.push(
-          fetch(
-            `/api/github?username=${encodeURIComponent(githubUsername.trim())}`,
-          )
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.error) throw new Error(`GitHub: ${data.error}`);
-              setGithubData(data);
-            }),
-        );
-      }
-
-      if (gitlabUsername.trim()) {
-        promises.push(
-          fetch(
-            `/api/gitlab?username=${encodeURIComponent(gitlabUsername.trim())}`,
-          )
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.error) throw new Error(`GitLab: ${data.error}`);
-              setGitlabData(data);
-            }),
-        );
-      }
-
-      if (promises.length === 0) {
-        setError('Enter at least one username.');
-        setLoading(false);
-        return;
-      }
-
-      await Promise.all(promises);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const hasData = githubData || gitlabData;
-
   return (
-    <main className="max-w-6xl mx-auto px-4 py-12">
-      <div className="text-center mb-10">
+    <>
+      <header className="max-w-6xl mx-auto px-4 pt-12 pb-0 text-center">
         <h1 className="flex justify-center mb-3">
           <GitAllLogo />
         </h1>
         <p style={{ color: 'var(--text-secondary)' }}>
           See GitHub &amp; GitLab contributions in one place.
         </p>
-      </div>
+      </header>
 
-      <SearchForm onSearch={handleSearch} loading={loading} />
+      <main className="max-w-6xl mx-auto px-4 pb-12">
+        <section aria-label="Contribution lookup tool" className="mt-10">
+          <ContributionExplorer />
+        </section>
 
-      {error && (
-        <div
-          className="mt-6 p-4 rounded-lg border text-sm"
-          style={{
-            borderColor: '#f85149',
-            color: '#f85149',
-            backgroundColor: 'rgba(248,81,73,0.1)',
-          }}
+        {/* ── About ─────────────────────────────────────────────── */}
+        <section
+          id="about"
+          aria-labelledby="about-heading"
+          className="mt-24 max-w-2xl mx-auto text-center"
         >
-          {error}
-        </div>
-      )}
+          <h2
+            id="about-heading"
+            className="text-lg font-semibold mb-3"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            What is GitAll?
+          </h2>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            GitAll is a free developer tool that aggregates your contribution
+            graphs from GitHub, GitLab, Bitbucket, and Gitea/Forgejo into one
+            unified heatmap. Enter your username on any supported platform and
+            instantly see your combined git activity — no account needed.
+          </p>
+        </section>
 
-      {hasData && (
-        <div className="mt-10">
-          <div className="flex items-center justify-between mb-6">
-            <StatsBar github={githubData} gitlab={gitlabData} />
-            <div
-              className="flex gap-1 p-1 rounded-lg"
-              style={{ backgroundColor: 'var(--bg-surface)' }}
-            >
-              {(['side-by-side', 'integrated'] as ViewMode[]).map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer"
-                  style={{
-                    backgroundColor:
-                      viewMode === mode ? 'var(--bg-elevated)' : 'transparent',
-                    color:
-                      viewMode === mode
-                        ? 'var(--text-primary)'
-                        : 'var(--text-secondary)',
-                  }}
-                >
-                  {mode === 'side-by-side' ? 'Side by Side' : 'Integrated'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {viewMode === 'side-by-side' ? (
-            <div className="space-y-8">
-              {githubData && (
-                <div>
-                  <h2
-                    className="text-sm font-medium mb-3"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    GitHub — @{githubData.username}
-                  </h2>
-                  <ContributionGrid data={githubData} platform="github" />
-                </div>
-              )}
-              {gitlabData && (
-                <div>
-                  <h2
-                    className="text-sm font-medium mb-3"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    GitLab — @{gitlabData.username}
-                  </h2>
-                  <ContributionGrid data={gitlabData} platform="gitlab" />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div>
-              <h2
-                className="text-sm font-medium mb-3"
-                style={{ color: 'var(--text-secondary)' }}
+        {/* ── How it works ──────────────────────────────────────── */}
+        <section
+          id="how-it-works"
+          aria-labelledby="how-heading"
+          className="mt-16 max-w-2xl mx-auto"
+        >
+          <h2
+            id="how-heading"
+            className="text-lg font-semibold mb-4 text-center"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            How it works
+          </h2>
+          <ol
+            className="space-y-3 text-sm"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            <li className="flex gap-3">
+              <span
+                className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--accent)',
+                }}
               >
-                Combined Activity
-                {githubData && gitlabData
-                  ? ` — @${githubData.username} + @${gitlabData.username}`
-                  : githubData
-                    ? ` — @${githubData.username}`
-                    : ` — @${gitlabData!.username}`}
-              </h2>
-              <ContributionGrid
-                data={mergeContributions(githubData, gitlabData)}
-                platform="integrated"
-              />
-            </div>
-          )}
-        </div>
-      )}
+                1
+              </span>
+              <span>
+                Enter your GitHub username, GitLab username, or both in the
+                search form above.
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span
+                className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--accent)',
+                }}
+              >
+                2
+              </span>
+              <span>
+                GitAll fetches your public contribution data directly from each
+                platform&apos;s API — no tokens or OAuth required.
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span
+                className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--accent)',
+                }}
+              >
+                3
+              </span>
+              <span>
+                View your contributions side by side or as a single integrated
+                cross-platform heatmap.
+              </span>
+            </li>
+          </ol>
+        </section>
 
-      <footer className="mt-16 pb-4 text-center">
+        {/* ── Supported platforms ───────────────────────────────── */}
+        <section
+          id="platforms"
+          aria-labelledby="platforms-heading"
+          className="mt-16 max-w-2xl mx-auto"
+        >
+          <h2
+            id="platforms-heading"
+            className="text-lg font-semibold mb-4 text-center"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Supported platforms
+          </h2>
+          <ul className="grid grid-cols-2 gap-3 text-sm">
+            {[
+              {
+                name: 'GitHub',
+                desc: 'The world\u2019s largest code hosting platform',
+                color: 'var(--gh-accent)',
+              },
+              {
+                name: 'GitLab',
+                desc: 'Self-hosted and cloud git repositories',
+                color: 'var(--gl-accent)',
+              },
+              {
+                name: 'Bitbucket',
+                desc: 'Atlassian\u2019s git collaboration platform',
+                color: 'var(--bb-accent)',
+                soon: true,
+              },
+              {
+                name: 'Gitea / Forgejo',
+                desc: 'Lightweight self-hosted git servers',
+                color: 'var(--gt-accent)',
+                soon: true,
+              },
+            ].map(({ name, desc, color, soon }) => (
+              <li
+                key={name}
+                className="p-3 rounded-lg text-sm"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <span className="font-medium block mb-0.5" style={{ color }}>
+                  {name}
+                  {soon && (
+                    <span
+                      className="ml-2 text-xs font-normal"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      coming soon
+                    </span>
+                  )}
+                </span>
+                <span style={{ color: 'var(--text-secondary)' }}>{desc}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ── Why GitAll ────────────────────────────────────────── */}
+        <section
+          id="why-gitall"
+          aria-labelledby="why-heading"
+          className="mt-16 max-w-2xl mx-auto"
+        >
+          <h2
+            id="why-heading"
+            className="text-lg font-semibold mb-4 text-center"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Why GitAll?
+          </h2>
+          <ul
+            className="space-y-2 text-sm"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            {[
+              'Your contribution history is scattered across multiple platforms with no unified view.',
+              'Recruiters and engineering managers need a single picture of your activity — GitAll provides it instantly.',
+              'No native GitHub or GitLab UI shows contributions across both platforms at once.',
+              'GitAll merges everything into one clean heatmap, completely free with no login required.',
+            ].map((point) => (
+              <li key={point} className="flex gap-2">
+                <span style={{ color: 'var(--accent)' }} aria-hidden="true">
+                  ✓
+                </span>
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ── FAQ ───────────────────────────────────────────────── */}
+        <section
+          id="faq"
+          aria-labelledby="faq-heading"
+          className="mt-16 max-w-2xl mx-auto"
+        >
+          <h2
+            id="faq-heading"
+            className="text-lg font-semibold mb-4 text-center"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Frequently Asked Questions
+          </h2>
+          <dl className="space-y-4">
+            {FAQ_ITEMS.map(({ question, answer }) => (
+              <div
+                key={question}
+                className="p-4 rounded-lg"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <dt
+                  className="text-sm font-medium mb-1"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {question}
+                </dt>
+                <dd
+                  className="text-sm"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {answer}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      </main>
+
+      <footer className="max-w-6xl mx-auto px-4 mt-16 pb-8 text-center">
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
           Built by{' '}
           <a
@@ -183,45 +286,6 @@ export default function Home() {
           </a>
         </p>
       </footer>
-    </main>
+    </>
   );
-}
-
-function mergeContributions(
-  github: ContributionData | null,
-  gitlab: ContributionData | null,
-): ContributionData {
-  const map = new Map<string, number>();
-
-  for (const entry of github?.calendar ?? []) {
-    map.set(entry.date, (map.get(entry.date) ?? 0) + entry.count);
-  }
-  for (const entry of gitlab?.calendar ?? []) {
-    map.set(entry.date, (map.get(entry.date) ?? 0) + entry.count);
-  }
-
-  const calendar = Array.from(map.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, count]) => ({ date, count, level: countToLevel(count) }));
-
-  const totalContributions = calendar.reduce((sum, d) => sum + d.count, 0);
-
-  return {
-    platform: 'integrated',
-    username: [github?.username, gitlab?.username].filter(Boolean).join(' + '),
-    totalContributions,
-    dateRange: {
-      from: calendar[0]?.date ?? null,
-      to: calendar[calendar.length - 1]?.date ?? null,
-    },
-    calendar,
-  };
-}
-
-function countToLevel(count: number): number {
-  if (count === 0) return 0;
-  if (count <= 3) return 1;
-  if (count <= 7) return 2;
-  if (count <= 15) return 3;
-  return 4;
 }
