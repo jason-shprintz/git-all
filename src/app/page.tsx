@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SearchForm } from "@/components/SearchForm";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { StatsBar } from "@/components/StatsBar";
+import { GitAllLogo } from "@/components/GitAllLogo";
 import type { ContributionData, ViewMode } from "@/lib/types";
 
 export default function Home() {
@@ -63,7 +64,9 @@ export default function Home() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-12">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold tracking-tight mb-2">GitAll</h1>
+        <h1 className="flex justify-center mb-3">
+          <GitAllLogo />
+        </h1>
         <p style={{ color: "var(--text-secondary)" }}>
           See GitHub &amp; GitLab contributions in one place.
         </p>
@@ -135,6 +138,21 @@ export default function Home() {
           )}
         </div>
       )}
+
+      <footer className="mt-16 pb-4 text-center">
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+          Built by{" "}
+          <a
+            href="https://toastbyte.studio"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--text-secondary)" }}
+            className="hover:underline"
+          >
+            Toastbyte Studios
+          </a>
+        </p>
+      </footer>
     </main>
   );
 }

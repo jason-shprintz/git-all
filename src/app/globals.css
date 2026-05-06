@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+/*
+ * ── GitAll Brand Palette ────────────────────────────────────────────
+ *
+ * Brand primary:   --brand         #2dd4bf  (cyan level-3)
+ * Brand hover:     --brand-hover   #5eead4  (cyan level-4)
+ * GitHub:          --gh-accent     #39d353  (green level-4)
+ * GitLab:          --gl-accent     #fd9a28  (orange level-4)
+ * Bitbucket:       --bb-accent     #4c9aff  (Atlassian blue)
+ * Gitea/Forgejo:   --gt-accent     #c084fc  (purple level-4)
+ * GitAll unified:  --ga-accent     #5eead4  (cyan level-4)
+ * Error:           --error         #f85149
+ * Success:         --success       #3fb950
+ *
+ * Typography:
+ *   Primary:    Inter — listed first in the font-family stack; loaded from the
+ *               system if available (common on macOS/Windows 11) or falls back
+ *               to the OS system sans-serif.
+ *   Monospace:  "JetBrains Mono", ui-monospace, monospace
+ * ────────────────────────────────────────────────────────────────────
+ */
+
 /* ── Dark theme (default) ──────────────────────────────────────────── */
 :root {
   --bg: #0d1117;
@@ -9,8 +30,21 @@
   --text-primary: #f0f6fc;
   --text-secondary: #8b949e;
   --text-muted: #484f58;
-  --accent: #58a6ff;
-  --accent-hover: #79c0ff;
+
+  /* Brand accent — cyan */
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+
+  /* Semantic / platform tokens */
+  --brand: #2dd4bf;
+  --brand-hover: #5eead4;
+  --gh-accent: #39d353;
+  --gl-accent: #fd9a28;
+  --bb-accent: #4c9aff;
+  --gt-accent: #c084fc;
+  --ga-accent: #5eead4;
+  --error: #f85149;
+  --success: #3fb950;
 
   /* Contribution levels — GitHub-style greens */
   --level-0: #161b22;
@@ -43,8 +77,21 @@
   --text-primary: #1f2328;
   --text-secondary: #656d76;
   --text-muted: #8b949e;
-  --accent: #0969da;
-  --accent-hover: #0550ae;
+
+  /* Brand accent — cyan (slightly deeper for contrast on white) */
+  --accent: #0d9488;
+  --accent-hover: #0f766e;
+
+  /* Semantic / platform tokens */
+  --brand: #0d9488;
+  --brand-hover: #0f766e;
+  --gh-accent: #216e39;
+  --gl-accent: #b35900;
+  --bb-accent: #0550ae;
+  --gt-accent: #7c3aed;
+  --ga-accent: #0d9488;
+  --error: #cf222e;
+  --success: #1a7f37;
 
   --level-0: #ebedf0;
   --level-1: #9be9a8;
@@ -74,8 +121,21 @@
   --text-primary: #f0f6fc;
   --text-secondary: #8b949e;
   --text-muted: #484f58;
-  --accent: #58a6ff;
-  --accent-hover: #79c0ff;
+
+  /* Brand accent — cyan */
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+
+  /* Semantic / platform tokens */
+  --brand: #2dd4bf;
+  --brand-hover: #5eead4;
+  --gh-accent: #39d353;
+  --gl-accent: #fd9a28;
+  --bb-accent: #4c9aff;
+  --gt-accent: #c084fc;
+  --ga-accent: #5eead4;
+  --error: #f85149;
+  --success: #3fb950;
 
   --level-0: #161b22;
   --level-1: #0e4429;
@@ -106,8 +166,21 @@
     --text-primary: #1f2328;
     --text-secondary: #656d76;
     --text-muted: #8b949e;
-    --accent: #0969da;
-    --accent-hover: #0550ae;
+
+    /* Brand accent — cyan (slightly deeper for contrast on white) */
+    --accent: #0d9488;
+    --accent-hover: #0f766e;
+
+    /* Semantic / platform tokens */
+    --brand: #0d9488;
+    --brand-hover: #0f766e;
+    --gh-accent: #216e39;
+    --gl-accent: #b35900;
+    --bb-accent: #0550ae;
+    --gt-accent: #7c3aed;
+    --ga-accent: #0d9488;
+    --error: #cf222e;
+    --success: #1a7f37;
 
     --level-0: #ebedf0;
     --level-1: #9be9a8;
@@ -132,5 +205,10 @@
 body {
   background: var(--bg);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  /* Inter is used when available (many systems include it); falls back to system sans-serif */
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+}
+
+.font-mono-data {
+  font-family: "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
 }
