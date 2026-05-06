@@ -1,17 +1,21 @@
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { FAQ_ITEMS } from '@/lib/faq';
 import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'GitAll — Unified Contribution Heatmap',
+  title: 'GitAll — View GitHub & GitLab Contributions in One Place',
   description:
-    'See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.',
+    'GitAll lets you see GitHub and GitLab contribution graphs in one unified heatmap. Free, no login required.',
   metadataBase: new URL('https://gitall.app'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'GitAll — Unified Contribution Heatmap',
+    title: 'GitAll — View GitHub & GitLab Contributions in One Place',
     description:
-      'See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.',
+      'GitAll lets you see GitHub and GitLab contribution graphs in one unified heatmap. Free, no login required.',
     url: 'https://gitall.app',
     siteName: 'GitAll',
     locale: 'en_US',
@@ -19,9 +23,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GitAll — Unified Contribution Heatmap',
+    title: 'GitAll — View GitHub & GitLab Contributions in One Place',
     description:
-      'See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.',
+      'GitAll lets you see GitHub and GitLab contribution graphs in one unified heatmap. Free, no login required.',
   },
   icons: {
     icon: [
@@ -44,12 +48,51 @@ const themeInitScript = `
 })();
 `.trim();
 
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'GitAll',
+    url: 'https://gitall.app',
+    description:
+      'See GitHub and GitLab contributions in one unified heatmap. Free, no login required.',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    creator: {
+      '@type': 'Organization',
+      name: 'Toastbyte Studios',
+      url: 'https://toastbyte.studio',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_ITEMS.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: answer,
+      },
+    })),
+  },
+];
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       </head>
       <body className="min-h-screen antialiased">
         <ThemeToggle />
