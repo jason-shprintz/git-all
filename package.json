@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "clean:appledouble": "find . -type f -name '._*' -delete",
     "lint": "next lint"
   },
   "dependencies": {
