@@ -11,31 +11,20 @@ export async function GET(request: NextRequest) {
   const baseUrl = DEFAULT_GITLAB_URL;
 
   try {
-    // Step 1: Resolve username to user ID
-    const usersResponse = await fetch(
-      `${baseUrl}/api/v4/users?username=${encodeURIComponent(username)}`,
+    // GitLab exposes the contribution calendar at /users/:username/calendar.json
+    // This is a semi-private endpoint (not under /api/v4/) but is the same one
+    // the GitLab profile UI uses. No authentication required for public profiles.
+    const calendarResponse = await fetch(
+      `${baseUrl}/users/${encodeURIComponent(username)}/calendar.json`,
       { headers: { "User-Agent": "git-all/0.1.0" } }
     );
 
-    if (!usersResponse.ok) {
-      throw new Error(`GitLab API returned ${usersResponse.status}`);
-    }
-
-    const users = await usersResponse.json();
-    if (!users.length) {
+    if (calendarResponse.status === 404) {
       return NextResponse.json(
         { error: `GitLab user '${username}' not found.` },
         { status: 404 }
       );
     }
-
-    const userId = users[0].id;
-
-    // Step 2: Fetch contribution calendar
-    const calendarResponse = await fetch(
-      `${baseUrl}/api/v4/users/${userId}/calendar`,
-      { headers: { "User-Agent": "git-all/0.1.0" } }
-    );
 
     if (!calendarResponse.ok) {
       throw new Error(`GitLab calendar API returned ${calendarResponse.status}`);
