@@ -4,26 +4,47 @@ import { useEffect, useState } from "react";
 
 type ThemeChoice = "light" | "dark" | "system";
 
-export function ThemeToggle() {
-  const [choice, setChoice] = useState<ThemeChoice>("system");
+function applyTheme(choice: ThemeChoice) {
+  const root = document.documentElement;
+  if (choice === "system") {
+    root.removeAttribute("data-theme");
+  } else {
+    root.setAttribute("data-theme", choice);
+  }
+}
 
-  /* On mount, read the persisted choice */
+export function ThemeToggle() {
+  /*
+   * Start as null (uninitialized) so the apply effect is a no-op on the first
+   * render. This prevents the two-effect race where the apply effect would run
+   * with the default "system" value before the init effect has read the
+   * persisted choice from localStorage.
+   */
+  const [choice, setChoice] = useState<ThemeChoice | null>(null);
+
+  /* On mount, read the persisted choice (guarded against unavailable storage) */
   useEffect(() => {
-    const stored = localStorage.getItem("theme") as ThemeChoice | null;
-    if (stored === "light" || stored === "dark" || stored === "system") {
-      setChoice(stored);
+    let stored: ThemeChoice = "system";
+    try {
+      const raw = localStorage.getItem("theme");
+      if (raw === "light" || raw === "dark" || raw === "system") {
+        stored = raw;
+      }
+    } catch {
+      // localStorage unavailable — fall back to "system"
     }
+    setChoice(stored);
   }, []);
 
-  /* Apply the choice whenever it changes */
+  /* Apply the choice to the DOM and persist it — skipped until initialized */
   useEffect(() => {
-    const root = document.documentElement;
-    if (choice === "system") {
-      root.removeAttribute("data-theme");
-    } else {
-      root.setAttribute("data-theme", choice);
+    if (choice === null) return;
+    applyTheme(choice);
+    try {
+      localStorage.setItem("theme", choice);
+    } catch {
+      // localStorage unavailable — skip persistence
     }
-    localStorage.setItem("theme", choice);
   }, [choice]);
 
   const options: { value: ThemeChoice; label: string; title: string }[] = [
@@ -31,6 +52,9 @@ export function ThemeToggle() {
     { value: "system", label: "⚙️", title: "System" },
     { value: "dark", label: "🌙", title: "Dark" },
   ];
+
+  /* Show "system" as selected while still reading from storage */
+  const activeChoice = choice ?? "system";
 
   return (
     <div
@@ -45,12 +69,12 @@ export function ThemeToggle() {
           onClick={() => setChoice(value)}
           title={title}
           aria-label={title}
-          aria-pressed={choice === value}
+          aria-pressed={activeChoice === value}
           className="px-2 py-1 text-sm rounded-md transition-colors cursor-pointer"
           style={{
-            backgroundColor: choice === value ? "var(--bg-elevated)" : "transparent",
-            color: choice === value ? "var(--text-primary)" : "var(--text-muted)",
-            border: choice === value ? "1px solid var(--border)" : "1px solid transparent",
+            backgroundColor: activeChoice === value ? "var(--bg-elevated)" : "transparent",
+            color: activeChoice === value ? "var(--text-primary)" : "var(--text-muted)",
+            border: activeChoice === value ? "1px solid var(--border)" : "1px solid transparent",
           }}
         >
           {label}
