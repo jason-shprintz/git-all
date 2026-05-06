@@ -1,32 +1,32 @@
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import "./globals.css";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemeToggle } from '@/components/ThemeToggle';
+import './globals.css';
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: "GitAll — Unified Contribution Heatmap",
+  title: 'GitAll — Unified Contribution Heatmap',
   description:
-    "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
-  metadataBase: new URL("https://gitall.app"),
+    'See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.',
+  metadataBase: new URL('https://gitall.app'),
   openGraph: {
-    title: "GitAll — Unified Contribution Heatmap",
+    title: 'GitAll — Unified Contribution Heatmap',
     description:
-      "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
-    url: "https://gitall.app",
-    siteName: "GitAll",
-    locale: "en_US",
-    type: "website",
+      'See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.',
+    url: 'https://gitall.app',
+    siteName: 'GitAll',
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "GitAll — Unified Contribution Heatmap",
+    card: 'summary_large_image',
+    title: 'GitAll — Unified Contribution Heatmap',
     description:
-      "See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.",
+      'See your GitHub and GitLab contributions in one place. View side-by-side or integrated heatmaps across platforms.',
   },
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
     ],
   },
 };
@@ -44,11 +44,7 @@ const themeInitScript = `
 })();
 `.trim();
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
