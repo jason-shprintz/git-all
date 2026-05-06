@@ -15,4 +15,4 @@ export interface ContributionData {
   calendar: CalendarDay[];
 }
 
-export type ViewMode = "side-by-side" | "integrated";
+export type ViewMode = 'side-by-side' | 'integrated';

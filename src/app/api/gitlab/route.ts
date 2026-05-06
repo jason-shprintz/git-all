@@ -1,11 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-const DEFAULT_GITLAB_URL = "https://gitlab.com";
+const DEFAULT_GITLAB_URL = 'https://gitlab.com';
 
 export async function GET(request: NextRequest) {
-  const username = request.nextUrl.searchParams.get("username");
+  const username = request.nextUrl.searchParams.get('username');
   if (!username) {
-    return NextResponse.json({ error: "Missing username parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing username parameter' },
+      { status: 400 },
+    );
   }
 
   const baseUrl = DEFAULT_GITLAB_URL;
@@ -16,18 +19,20 @@ export async function GET(request: NextRequest) {
     // the GitLab profile UI uses. No authentication required for public profiles.
     const calendarResponse = await fetch(
       `${baseUrl}/users/${encodeURIComponent(username)}/calendar.json`,
-      { headers: { "User-Agent": "git-all/0.1.0" } }
+      { headers: { 'User-Agent': 'git-all/0.1.0' } },
     );
 
     if (calendarResponse.status === 404) {
       return NextResponse.json(
         { error: `GitLab user '${username}' not found.` },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (!calendarResponse.ok) {
-      throw new Error(`GitLab calendar API returned ${calendarResponse.status}`);
+      throw new Error(
+        `GitLab calendar API returned ${calendarResponse.status}`,
+      );
     }
 
     const calendarData: Record<string, number> = await calendarResponse.json();
@@ -41,7 +46,7 @@ export async function GET(request: NextRequest) {
     const cursor = new Date(oneYearAgo);
 
     while (cursor <= now) {
-      const dateStr = cursor.toISOString().split("T")[0];
+      const dateStr = cursor.toISOString().split('T')[0];
       const count = calendarData[dateStr] ?? 0;
       calendar.push({
         date: dateStr,
@@ -54,7 +59,7 @@ export async function GET(request: NextRequest) {
     const totalContributions = calendar.reduce((sum, d) => sum + d.count, 0);
 
     return NextResponse.json({
-      platform: "gitlab",
+      platform: 'gitlab',
       username,
       totalContributions,
       dateRange: {
@@ -64,7 +69,7 @@ export async function GET(request: NextRequest) {
       calendar,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
+    const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

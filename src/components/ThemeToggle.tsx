@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-type ThemeChoice = "light" | "dark" | "system";
+type ThemeChoice = 'light' | 'dark' | 'system';
 
 function applyTheme(choice: ThemeChoice) {
   const root = document.documentElement;
-  if (choice === "system") {
-    root.removeAttribute("data-theme");
+  if (choice === 'system') {
+    root.removeAttribute('data-theme');
   } else {
-    root.setAttribute("data-theme", choice);
+    root.setAttribute('data-theme', choice);
   }
 }
 
@@ -24,10 +24,10 @@ export function ThemeToggle() {
 
   /* On mount, read the persisted choice (guarded against unavailable storage) */
   useEffect(() => {
-    let stored: ThemeChoice = "system";
+    let stored: ThemeChoice = 'system';
     try {
-      const raw = localStorage.getItem("theme");
-      if (raw === "light" || raw === "dark" || raw === "system") {
+      const raw = localStorage.getItem('theme');
+      if (raw === 'light' || raw === 'dark' || raw === 'system') {
         stored = raw;
       }
     } catch {
@@ -41,25 +41,28 @@ export function ThemeToggle() {
     if (choice === null) return;
     applyTheme(choice);
     try {
-      localStorage.setItem("theme", choice);
+      localStorage.setItem('theme', choice);
     } catch {
       // localStorage unavailable — skip persistence
     }
   }, [choice]);
 
   const options: { value: ThemeChoice; label: string; title: string }[] = [
-    { value: "light", label: "☀️", title: "Light" },
-    { value: "system", label: "⚙️", title: "System" },
-    { value: "dark", label: "🌙", title: "Dark" },
+    { value: 'light', label: '☀️', title: 'Light' },
+    { value: 'system', label: '⚙️', title: 'System' },
+    { value: 'dark', label: '🌙', title: 'Dark' },
   ];
 
   /* Show "system" as selected while still reading from storage */
-  const activeChoice = choice ?? "system";
+  const activeChoice = choice ?? 'system';
 
   return (
     <div
       className="fixed top-4 right-4 z-50 flex gap-1 p-1 rounded-lg"
-      style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)" }}
+      style={{
+        backgroundColor: 'var(--bg-surface)',
+        border: '1px solid var(--border)',
+      }}
       role="group"
       aria-label="Theme selector"
     >
@@ -72,9 +75,16 @@ export function ThemeToggle() {
           aria-pressed={activeChoice === value}
           className="px-2 py-1 text-sm rounded-md transition-colors cursor-pointer"
           style={{
-            backgroundColor: activeChoice === value ? "var(--bg-elevated)" : "transparent",
-            color: activeChoice === value ? "var(--text-primary)" : "var(--text-muted)",
-            border: activeChoice === value ? "1px solid var(--border)" : "1px solid transparent",
+            backgroundColor:
+              activeChoice === value ? 'var(--bg-elevated)' : 'transparent',
+            color:
+              activeChoice === value
+                ? 'var(--text-primary)'
+                : 'var(--text-muted)',
+            border:
+              activeChoice === value
+                ? '1px solid var(--border)'
+                : '1px solid transparent',
           }}
         >
           {label}

@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "clean:appledouble": "find . -type f -name '._*' -delete",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,css}'",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx,css}'"
   },
   "dependencies": {
     "next": "^15.3.0",
@@ -19,6 +22,15 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.2",
+    "@typescript-eslint/parser": "^8.59.2",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^15.5.15",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.3",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.7.0"
   }
