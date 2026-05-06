@@ -64,9 +64,9 @@ export default function Home() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-12">
       <div className="text-center mb-10">
-        <div className="flex justify-center mb-3">
+        <h1 className="flex justify-center mb-3">
           <GitAllLogo />
-        </div>
+        </h1>
         <p style={{ color: "var(--text-secondary)" }}>
           See GitHub &amp; GitLab contributions in one place.
         </p>

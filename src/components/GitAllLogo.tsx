@@ -1,8 +1,10 @@
 /**
  * GitAllLogo — SVG mark + wordmark for the GitAll brand.
  *
- * The mark is a 3×3 grid of contribution squares in three platform colors:
- *   GitHub green (#39d353), GitLab orange (#fd9a28), GitAll cyan (#2dd4bf / #5eead4)
+ * The mark is a 3×3 grid of contribution squares using the CSS platform tokens
+ * defined in globals.css (--gh-accent, --gl-accent, --brand, --ga-accent).
+ * Inline SVG inherits these variables from the document, so the mark stays
+ * consistent with any future token updates.
  */
 export function GitAllLogo({ className }: { className?: string }) {
   return (
@@ -16,17 +18,17 @@ export function GitAllLogo({ className }: { className?: string }) {
         aria-hidden="true"
       >
         {/* Row 1 */}
-        <rect x="2"  y="2"  width="8" height="8" rx="1.5" fill="#39d353" />
-        <rect x="12" y="2"  width="8" height="8" rx="1.5" fill="#fd9a28" />
-        <rect x="22" y="2"  width="8" height="8" rx="1.5" fill="#2dd4bf" />
+        <rect x="2"  y="2"  width="8" height="8" rx="1.5" style={{ fill: "var(--gh-accent)" }} />
+        <rect x="12" y="2"  width="8" height="8" rx="1.5" style={{ fill: "var(--gl-accent)" }} />
+        <rect x="22" y="2"  width="8" height="8" rx="1.5" style={{ fill: "var(--brand)" }} />
         {/* Row 2 */}
-        <rect x="2"  y="12" width="8" height="8" rx="1.5" fill="#fd9a28" />
-        <rect x="12" y="12" width="8" height="8" rx="1.5" fill="#5eead4" />
-        <rect x="22" y="12" width="8" height="8" rx="1.5" fill="#39d353" />
+        <rect x="2"  y="12" width="8" height="8" rx="1.5" style={{ fill: "var(--gl-accent)" }} />
+        <rect x="12" y="12" width="8" height="8" rx="1.5" style={{ fill: "var(--ga-accent)" }} />
+        <rect x="22" y="12" width="8" height="8" rx="1.5" style={{ fill: "var(--gh-accent)" }} />
         {/* Row 3 */}
-        <rect x="2"  y="22" width="8" height="8" rx="1.5" fill="#2dd4bf" />
-        <rect x="12" y="22" width="8" height="8" rx="1.5" fill="#39d353" />
-        <rect x="22" y="22" width="8" height="8" rx="1.5" fill="#fd9a28" />
+        <rect x="2"  y="22" width="8" height="8" rx="1.5" style={{ fill: "var(--brand)" }} />
+        <rect x="12" y="22" width="8" height="8" rx="1.5" style={{ fill: "var(--gh-accent)" }} />
+        <rect x="22" y="22" width="8" height="8" rx="1.5" style={{ fill: "var(--gl-accent)" }} />
       </svg>
 
       {/* Wordmark */}
