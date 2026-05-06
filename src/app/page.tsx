@@ -152,7 +152,7 @@ export default function Home() {
             {[
               {
                 name: 'GitHub',
-                desc: 'The world\u2019s largest code hosting platform',
+                desc: "The world's largest code hosting platform",
                 color: 'var(--gh-accent)',
               },
               {
@@ -162,7 +162,7 @@ export default function Home() {
               },
               {
                 name: 'Bitbucket',
-                desc: 'Atlassian\u2019s git collaboration platform',
+                desc: "Atlassian's git collaboration platform",
                 color: 'var(--bb-accent)',
                 soon: true,
               },
