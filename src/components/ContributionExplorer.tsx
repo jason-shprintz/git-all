@@ -96,6 +96,7 @@ export function ContributionExplorer() {
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
+                  aria-pressed={viewMode === mode}
                   className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer"
                   style={{
                     backgroundColor:
