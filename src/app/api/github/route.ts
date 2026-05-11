@@ -77,10 +77,6 @@ function getCachedContribution(cacheKey: string) {
     return null;
   }
 
-  // Reinsert the entry so Map iteration order reflects recent use for LRU.
-  contributionCache.delete(cacheKey);
-  contributionCache.set(cacheKey, cached);
-
   return cached.data;
 }
 
@@ -120,20 +116,27 @@ function createCachedResponse(
 }
 
 export async function GET(request: NextRequest) {
-  const username = request.nextUrl.searchParams.get('username')?.trim();
-  if (!username) {
+  const requestedUsername = request.nextUrl.searchParams
+    .get('username')
+    ?.trim();
+  if (!requestedUsername) {
     return NextResponse.json(
       { error: 'Missing username parameter' },
       { status: 400, headers: { 'Cache-Control': 'no-store' } },
     );
   }
 
-  if (!GITHUB_USERNAME_PATTERN.test(username)) {
+  if (!GITHUB_USERNAME_PATTERN.test(requestedUsername)) {
     return NextResponse.json(
-      { error: 'Invalid GitHub username.' },
+      {
+        error:
+          'Invalid GitHub username. Usernames must be 1-39 characters long, contain only letters, numbers, and hyphens, and cannot start or end with a hyphen.',
+      },
       { status: 400, headers: { 'Cache-Control': 'no-store' } },
     );
   }
+
+  const username = requestedUsername.toLowerCase();
 
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
