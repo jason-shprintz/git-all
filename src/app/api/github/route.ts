@@ -5,6 +5,7 @@ const CACHE_TTL_MS = 15 * 60 * 1000;
 const CACHE_TTL_SECONDS = Math.floor(CACHE_TTL_MS / 1000);
 const MAX_CACHE_ENTRIES = 500;
 const CACHE_CONTROL_HEADER = `public, s-maxage=${CACHE_TTL_SECONDS}, stale-while-revalidate=86400`;
+const GITHUB_USERNAME_PATTERN = /^(?!-)[A-Za-z0-9-]{1,39}(?<!-)$/;
 
 const CONTRIBUTIONS_QUERY = `
   query($username: String!, $from: DateTime, $to: DateTime) {
@@ -91,18 +92,19 @@ function setCachedContribution(
 
   pruneExpiredEntries(now);
 
-  contributionCache.delete(cacheKey);
-  contributionCache.set(cacheKey, {
-    data,
-    expiresAt: now + CACHE_TTL_MS,
-  });
+  const hadEntry = contributionCache.delete(cacheKey);
 
-  if (contributionCache.size > MAX_CACHE_ENTRIES) {
+  if (!hadEntry && contributionCache.size >= MAX_CACHE_ENTRIES) {
     const oldestKey = contributionCache.keys().next().value;
     if (oldestKey) {
       contributionCache.delete(oldestKey);
     }
   }
+
+  contributionCache.set(cacheKey, {
+    data,
+    expiresAt: now + CACHE_TTL_MS,
+  });
 }
 
 function createCachedResponse(
@@ -126,6 +128,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  if (!GITHUB_USERNAME_PATTERN.test(username)) {
+    return NextResponse.json(
+      { error: 'Invalid GitHub username.' },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     return NextResponse.json(
@@ -138,7 +147,7 @@ export async function GET(request: NextRequest) {
     const refresh = request.nextUrl.searchParams.get('refresh') === 'true';
     // Keep the key shaped as platform:username so the cache structure can stay
     // consistent if other contribution sources adopt the same strategy later.
-    const cacheKey = `github:${username.toLowerCase()}`;
+    const cacheKey = `github:${username}`;
     const cached = getCachedContribution(cacheKey);
 
     if (!refresh && cached) {
