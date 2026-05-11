@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const GITHUB_GRAPHQL_URL = 'https://api.github.com/graphql';
 const CACHE_TTL_MS = 15 * 60 * 1000;
-const CACHE_CONTROL_HEADER =
-  'public, s-maxage=900, stale-while-revalidate=86400';
+const CACHE_TTL_SECONDS = Math.floor(CACHE_TTL_MS / 1000);
+const MAX_CACHE_ENTRIES = 500;
+const CACHE_CONTROL_HEADER = `public, s-maxage=${CACHE_TTL_SECONDS}, stale-while-revalidate=86400`;
 
 const CONTRIBUTIONS_QUERY = `
   query($username: String!, $from: DateTime, $to: DateTime) {
@@ -47,10 +48,61 @@ interface GithubContributionResponse {
   }>;
 }
 
+// This cache is intentionally per-instance; move it to Workers Cache or KV
+// if the app needs shared caching across multiple runtimes.
 const contributionCache = new Map<
   string,
   { data: GithubContributionResponse; expiresAt: number }
 >();
+
+function pruneExpiredEntries(now: number) {
+  for (const [key, entry] of contributionCache.entries()) {
+    if (entry.expiresAt <= now) {
+      contributionCache.delete(key);
+    }
+  }
+}
+
+function getCachedContribution(cacheKey: string) {
+  const now = Date.now();
+  const cached = contributionCache.get(cacheKey);
+
+  if (!cached) {
+    return null;
+  }
+
+  if (cached.expiresAt <= now) {
+    contributionCache.delete(cacheKey);
+    return null;
+  }
+
+  contributionCache.delete(cacheKey);
+  contributionCache.set(cacheKey, cached);
+
+  return cached.data;
+}
+
+function setCachedContribution(
+  cacheKey: string,
+  data: GithubContributionResponse,
+) {
+  const now = Date.now();
+
+  pruneExpiredEntries(now);
+
+  contributionCache.delete(cacheKey);
+  contributionCache.set(cacheKey, {
+    data,
+    expiresAt: now + CACHE_TTL_MS,
+  });
+
+  if (contributionCache.size > MAX_CACHE_ENTRIES) {
+    const oldestKey = contributionCache.keys().next().value;
+    if (oldestKey) {
+      contributionCache.delete(oldestKey);
+    }
+  }
+}
 
 function createCachedResponse(
   body: GithubContributionResponse,
@@ -84,14 +136,10 @@ export async function GET(request: NextRequest) {
   try {
     const refresh = request.nextUrl.searchParams.get('refresh') === 'true';
     const cacheKey = `github:${username.toLowerCase()}`;
-    const cached = contributionCache.get(cacheKey);
+    const cached = getCachedContribution(cacheKey);
 
     if (!refresh && cached) {
-      if (cached.expiresAt > Date.now()) {
-        return createCachedResponse(cached.data, 'HIT');
-      }
-
-      contributionCache.delete(cacheKey);
+      return createCachedResponse(cached, 'HIT');
     }
 
     const now = new Date();
@@ -163,10 +211,7 @@ export async function GET(request: NextRequest) {
       ),
     };
 
-    contributionCache.set(cacheKey, {
-      data: payload,
-      expiresAt: Date.now() + CACHE_TTL_MS,
-    });
+    setCachedContribution(cacheKey, payload);
 
     return createCachedResponse(payload, refresh ? 'BYPASS' : 'MISS');
   } catch (err) {
