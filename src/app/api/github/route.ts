@@ -76,6 +76,7 @@ function getCachedContribution(cacheKey: string) {
     return null;
   }
 
+  // Reinsert the entry so Map iteration order reflects recent use for LRU.
   contributionCache.delete(cacheKey);
   contributionCache.set(cacheKey, cached);
 
@@ -135,6 +136,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const refresh = request.nextUrl.searchParams.get('refresh') === 'true';
+    // Keep the key shaped as platform:username so the cache structure can stay
+    // consistent if other contribution sources adopt the same strategy later.
     const cacheKey = `github:${username.toLowerCase()}`;
     const cached = getCachedContribution(cacheKey);
 
