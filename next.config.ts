@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {};
 export default nextConfig;
 
 // Initialize OpenNext Cloudflare bindings for local development only
-if (process.env.NODE_ENV === 'development') {
-  // @ts-ignore - devDependency, not available during production builds
-  import('@opennextjs/cloudflare').then((m: { initOpenNextCloudflareForDev: () => void }) =>
-    m.initOpenNextCloudflareForDev(),
-  );
+// Opt-in via env var because some environments (CI/sandboxes) disallow local listeners/spawned dev helpers.
+if (process.env.NODE_ENV === 'development' && process.env.OPENNEXT_CLOUDFLARE_DEV === '1') {
+  void import('@opennextjs/cloudflare')
+    .then((m: { initOpenNextCloudflareForDev: () => void }) => m.initOpenNextCloudflareForDev())
+    .catch(() => {});
 }
