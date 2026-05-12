@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { APP_USER_AGENT } from '@/lib/app-metadata';
 
 const GITHUB_GRAPHQL_URL = 'https://api.github.com/graphql';
 const CACHE_TTL_MS = 15 * 60 * 1000;
@@ -56,6 +57,10 @@ const contributionCache = new Map<
   string,
   { data: GithubContributionResponse; expiresAt: number }
 >();
+const inFlightContributionRequests = new Map<
+  string,
+  Promise<GithubContributionResponse | null>
+>();
 
 function pruneExpiredEntries(now: number) {
   for (const [key, entry] of contributionCache.entries()) {
@@ -110,10 +115,30 @@ function createCachedResponse(
 ) {
   return NextResponse.json(body, {
     headers: {
-      'Cache-Control': CACHE_CONTROL_HEADER,
+      'Cache-Control':
+        cacheStatus === 'BYPASS' ? 'no-store' : CACHE_CONTROL_HEADER,
       'X-Cache': cacheStatus,
     },
   });
+}
+
+function getOrCreateInFlightContributionRequest(
+  cacheKey: string,
+  loadContribution: () => Promise<GithubContributionResponse | null>,
+) {
+  const existingRequest = inFlightContributionRequests.get(cacheKey);
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const request = loadContribution().finally(() => {
+    if (inFlightContributionRequests.get(cacheKey) === request) {
+      inFlightContributionRequests.delete(cacheKey);
+    }
+  });
+
+  inFlightContributionRequests.set(cacheKey, request);
+  return request;
 }
 
 export async function GET(request: NextRequest) {
@@ -158,76 +183,90 @@ export async function GET(request: NextRequest) {
       return createCachedResponse(cached, 'HIT');
     }
 
-    const now = new Date();
-    const oneYearAgo = new Date(now);
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const payload = await getOrCreateInFlightContributionRequest(
+      cacheKey,
+      async () => {
+        const now = new Date();
+        const oneYearAgo = new Date(now);
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    const response = await fetch(GITHUB_GRAPHQL_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'git-all/0.1.0',
+        const response = await fetch(GITHUB_GRAPHQL_URL, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'User-Agent': APP_USER_AGENT,
+          },
+          body: JSON.stringify({
+            query: CONTRIBUTIONS_QUERY,
+            variables: {
+              username,
+              from: oneYearAgo.toISOString(),
+              to: now.toISOString(),
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`GitHub API returned ${response.status}`);
+        }
+
+        const json = await response.json();
+
+        if (json.errors) {
+          throw new Error(
+            json.errors.map((e: { message: string }) => e.message).join('; '),
+          );
+        }
+
+        const user = json.data?.user;
+        if (!user) {
+          return null;
+        }
+
+        const calendar = user.contributionsCollection.contributionCalendar;
+        const days = calendar.weeks.flatMap(
+          (w: {
+            contributionDays: Array<{
+              date: string;
+              contributionCount: number;
+              color: string;
+            }>;
+          }) => w.contributionDays,
+        );
+
+        const freshPayload: GithubContributionResponse = {
+          platform: 'github',
+          username: user.login,
+          totalContributions: calendar.totalContributions,
+          dateRange: {
+            from: days[0]?.date ?? null,
+            to: days[days.length - 1]?.date ?? null,
+          },
+          calendar: days.map(
+            (d: {
+              date: string;
+              contributionCount: number;
+              color: string;
+            }) => ({
+              date: d.date,
+              count: d.contributionCount,
+              level: COLOR_TO_LEVEL[d.color.toLowerCase()] ?? 0,
+            }),
+          ),
+        };
+
+        setCachedContribution(cacheKey, freshPayload);
+        return freshPayload;
       },
-      body: JSON.stringify({
-        query: CONTRIBUTIONS_QUERY,
-        variables: {
-          username,
-          from: oneYearAgo.toISOString(),
-          to: now.toISOString(),
-        },
-      }),
-    });
+    );
 
-    if (!response.ok) {
-      throw new Error(`GitHub API returned ${response.status}`);
-    }
-
-    const json = await response.json();
-
-    if (json.errors) {
-      throw new Error(
-        json.errors.map((e: { message: string }) => e.message).join('; '),
-      );
-    }
-
-    const user = json.data?.user;
-    if (!user) {
+    if (!payload) {
       return NextResponse.json(
         { error: `GitHub user '${username}' not found.` },
         { status: 404, headers: { 'Cache-Control': 'no-store' } },
       );
     }
-
-    const calendar = user.contributionsCollection.contributionCalendar;
-    const days = calendar.weeks.flatMap(
-      (w: {
-        contributionDays: Array<{
-          date: string;
-          contributionCount: number;
-          color: string;
-        }>;
-      }) => w.contributionDays,
-    );
-
-    const payload: GithubContributionResponse = {
-      platform: 'github',
-      username: user.login,
-      totalContributions: calendar.totalContributions,
-      dateRange: {
-        from: days[0]?.date ?? null,
-        to: days[days.length - 1]?.date ?? null,
-      },
-      calendar: days.map(
-        (d: { date: string; contributionCount: number; color: string }) => ({
-          date: d.date,
-          count: d.contributionCount,
-          level: COLOR_TO_LEVEL[d.color.toLowerCase()] ?? 0,
-        }),
-      ),
-    };
-
-    setCachedContribution(cacheKey, payload);
 
     return createCachedResponse(payload, refresh ? 'BYPASS' : 'MISS');
   } catch (err) {
