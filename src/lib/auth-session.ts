@@ -36,11 +36,20 @@ function toBase64Url(bytes: Uint8Array): string {
   for (const byte of bytes) {
     binary += String.fromCharCode(byte);
   }
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
-function fromBase64Url(str: string): Uint8Array {
-  const padded = str.replace(/-/g, '+').replace(/_/g, '/');
+function fromBase64Url(str: string): Uint8Array<ArrayBuffer> {
+  const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  const paddingLength = (4 - (base64.length % 4)) % 4;
+  if (paddingLength === 3) {
+    throw new Error('Invalid base64url string');
+  }
+
+  const padded = `${base64}${'='.repeat(paddingLength)}`;
   const binary = atob(padded);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
@@ -74,13 +83,10 @@ async function getSessionKey(): Promise<CryptoKey | null> {
   const encoded = new TextEncoder().encode(secret);
   const hash = await crypto.subtle.digest('SHA-256', encoded);
 
-  return crypto.subtle.importKey(
-    'raw',
-    hash,
-    { name: 'AES-GCM' },
-    false,
-    ['encrypt', 'decrypt'],
-  );
+  return crypto.subtle.importKey('raw', hash, { name: 'AES-GCM' }, false, [
+    'encrypt',
+    'decrypt',
+  ]);
 }
 
 // ── Encode / Decode ──────────────────────────────────────────────────
