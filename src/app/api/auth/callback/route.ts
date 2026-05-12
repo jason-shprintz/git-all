@@ -30,13 +30,7 @@ function createErrorRedirect(request: NextRequest, code: string) {
 
 export async function GET(request: NextRequest) {
   if (!hasGithubOAuthConfig()) {
-    return NextResponse.json(
-      {
-        error:
-          'Server misconfiguration: GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET are required.',
-      },
-      { status: 500, headers: { 'Cache-Control': 'no-store' } },
-    );
+    return createErrorRedirect(request, 'oauth_not_configured');
   }
 
   const code = request.nextUrl.searchParams.get('code');

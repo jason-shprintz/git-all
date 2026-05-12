@@ -102,6 +102,9 @@ export async function encodeAuthSession(
   const iv = new Uint8Array(12);
   crypto.getRandomValues(iv);
 
+  // Note: the OAuth access token is encrypted and authenticated in this
+  // HttpOnly cookie payload. For stricter theft resistance, migrate to an
+  // opaque session ID backed by server-side token storage.
   const payload: StoredAuthSession = {
     version: SESSION_VERSION,
     accessToken: session.accessToken,

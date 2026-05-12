@@ -25,6 +25,8 @@ A GitHub personal access token is needed to call the GraphQL API (even for publi
 
 OAuth is optional. Anonymous users can still use the app normally, but signed-in users can use their own GitHub API rate limit and unlock private contribution data on their own profile.
 
+OAuth session data is stored in an encrypted, authenticated `httpOnly` cookie so it is not available to client-side JavaScript. If your deployment requires stronger resistance to cookie theft, use an opaque session id with server-side token storage instead.
+
 1. Create a GitHub OAuth App: **GitHub Settings → Developer settings → OAuth Apps → New OAuth App**
 2. Set **Authorization callback URL** to:
    - `http://localhost:3000/api/auth/callback` for local dev
@@ -44,7 +46,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Features
 
-- **GitHub contributions** via GraphQL API (server-side, token stays private)
+- **GitHub contributions** via GraphQL API (server-side requests; OAuth token is encrypted in `httpOnly` session cookie)
 - **GitLab contributions** via public REST API (no auth needed)
 - **Side-by-side view** with platform-specific colors (green for GitHub, orange for GitLab)
 - **Integrated view** that merges both calendars into a single heatmap

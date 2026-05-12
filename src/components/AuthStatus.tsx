@@ -32,7 +32,7 @@ export function AuthStatus() {
       })
       .catch(() => {
         if (isMounted) {
-          setSession({ authenticated: false, oauthEnabled: false });
+          setSession({ authenticated: false, oauthEnabled: true });
         }
       });
 
