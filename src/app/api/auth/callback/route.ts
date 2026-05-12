@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       return createErrorRedirect(request, 'invalid_user_data');
     }
 
-    const serializedSession = encodeAuthSession({
+    const serializedSession = await encodeAuthSession({
       accessToken: tokenData.access_token,
       user: {
         login: userData.login,

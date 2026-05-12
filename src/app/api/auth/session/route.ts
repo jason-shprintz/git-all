@@ -5,7 +5,7 @@ import {
 } from '@/lib/auth-session';
 
 export async function GET(request: NextRequest) {
-  const session = getAuthSessionFromRequest(request);
+  const session = await getAuthSessionFromRequest(request);
   const oauthEnabled = hasGithubOAuthConfig();
 
   if (!session) {

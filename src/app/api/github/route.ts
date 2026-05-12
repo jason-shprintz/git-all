@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
 
   const username = requestedUsername.toLowerCase();
 
-  const authSession = getAuthSessionFromRequest(request);
+  const authSession = await getAuthSessionFromRequest(request);
   const authSessionLogin = authSession?.user.login.toLowerCase() ?? null;
   const token = authSession?.accessToken ?? process.env.GITHUB_TOKEN;
   const shouldBypassCache = Boolean(authSession);
