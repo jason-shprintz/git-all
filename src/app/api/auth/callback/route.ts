@@ -70,6 +70,11 @@ export async function GET(request: NextRequest) {
 
   const tokenData = await tokenResponse.json();
   if (!tokenResponse.ok || tokenData.error || !tokenData.access_token) {
+    console.error('GitHub OAuth token exchange failed', {
+      status: tokenResponse.status,
+      error: tokenData.error ?? null,
+      errorDescription: tokenData.error_description ?? null,
+    });
     return createErrorRedirect(request, 'token_exchange_failed');
   }
 

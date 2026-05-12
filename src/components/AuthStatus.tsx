@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 interface AuthSessionResponse {
@@ -42,9 +43,9 @@ export function AuthStatus() {
   if (session?.authenticated && session.user) {
     return (
       <div className="flex items-center gap-2 text-xs">
-        <img
+        <Image
           src={session.user.avatarUrl}
-          alt={`${session.user.login} avatar`}
+          alt={`Avatar for @${session.user.login}`}
           width={20}
           height={20}
           className="rounded-full"
