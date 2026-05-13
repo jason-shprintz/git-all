@@ -264,8 +264,8 @@ function mergeAllContributions(
   return {
     platform: 'integrated',
     username: sources
-      .filter(Boolean)
-      .map((d) => d!.username)
+      .filter((d): d is ContributionData => d !== null)
+      .map((d) => d.username)
       .join(' + '),
     totalContributions,
     dateRange: {
