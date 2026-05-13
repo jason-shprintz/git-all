@@ -29,8 +29,10 @@ export function MultiUserForm({ onSearch, loading }: MultiUserFormProps) {
   ]);
 
   const addEntry = () => {
-    if (entries.length >= MAX_USERS) return;
-    setEntries((prev) => [...prev, createEntry()]);
+    setEntries((prev) => {
+      if (prev.length >= MAX_USERS) return prev;
+      return [...prev, createEntry()];
+    });
   };
 
   const removeEntry = (id: string) => {
