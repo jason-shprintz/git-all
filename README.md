@@ -52,6 +52,9 @@ Open [http://localhost:3000](http://localhost:3000).
 - **Integrated view** that merges both calendars into a single heatmap
 - **Stats bar** showing per-platform and combined totals
 - **Tooltips** on hover showing exact counts per day
+- **Time-period filters** for logged-in users, including preset ranges and a custom date picker
+
+> GitLab's public calendar endpoint only exposes roughly the last 12 months, so older custom or "Last year" ranges may be truncated on the GitLab side.
 
 ## Tech Stack
 

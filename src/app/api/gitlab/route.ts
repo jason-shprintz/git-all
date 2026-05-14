@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { APP_USER_AGENT } from '@/lib/app-metadata';
+import {
+  DEFAULT_CONTRIBUTION_PERIOD,
+  formatUtcDate,
+  getContributionDateRange,
+  getTodayUtc,
+  normalizeRequestedContributionRange,
+  parseDateInput,
+} from '@/lib/contribution-period';
 
 const DEFAULT_GITLAB_URL = 'https://gitlab.com';
 
@@ -10,6 +18,11 @@ export async function GET(request: NextRequest) {
       { error: 'Missing username parameter' },
       { status: 400 },
     );
+  }
+
+  const requestedRange = normalizeRequestedRange(request);
+  if ('error' in requestedRange) {
+    return NextResponse.json({ error: requestedRange.error }, { status: 400 });
   }
 
   const baseUrl = DEFAULT_GITLAB_URL;
@@ -38,27 +51,38 @@ export async function GET(request: NextRequest) {
 
     const calendarData: Record<string, number> = await calendarResponse.json();
 
-    // Build full 365-day calendar
-    const now = new Date();
-    const oneYearAgo = new Date(now);
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const availableRange = getContributionDateRange(
+      DEFAULT_CONTRIBUTION_PERIOD,
+      getTodayUtc(),
+    );
+    const effectiveRange = intersectRanges(requestedRange, availableRange);
 
     const calendar: Array<{ date: string; count: number; level: number }> = [];
-    const cursor = new Date(oneYearAgo);
+    if (effectiveRange) {
+      const cursor = parseDateInput(effectiveRange.from);
+      const end = parseDateInput(effectiveRange.to);
 
-    while (cursor <= now) {
-      const dateStr = cursor.toISOString().split('T')[0];
-      const count = calendarData[dateStr] ?? 0;
-      calendar.push({
-        date: dateStr,
-        count,
-        level: countToLevel(count),
-      });
-      cursor.setDate(cursor.getDate() + 1);
+      if (!cursor || !end) {
+        throw new Error('Invalid effective GitLab date range.');
+      }
+
+      while (cursor <= end) {
+        const dateStr = formatUtcDate(cursor);
+        const count = calendarData[dateStr] ?? 0;
+        calendar.push({
+          date: dateStr,
+          count,
+          level: countToLevel(count),
+        });
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+      }
     }
 
     const totalContributions = calendar.reduce((sum, d) => sum + d.count, 0);
 
+    // dateRange reflects the actual slice returned to the client after
+    // intersecting the requested range with GitLab's trailing-year calendar.
+    // The UI uses it to show when older requested dates were truncated.
     return NextResponse.json({
       platform: 'gitlab',
       username,
@@ -73,6 +97,36 @@ export async function GET(request: NextRequest) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+function normalizeRequestedRange(request: NextRequest):
+  | { from: string; to: string }
+  | {
+      error: string;
+    } {
+  return normalizeRequestedContributionRange(
+    request.nextUrl.searchParams.get('from'),
+    request.nextUrl.searchParams.get('to'),
+    {
+      rangeTooLargeError: 'Contribution lookups can span at most 1 year.',
+    },
+  );
+}
+
+function intersectRanges(
+  requestedRange: { from: string; to: string },
+  availableRange: { from: string; to: string },
+) {
+  const start =
+    requestedRange.from > availableRange.from
+      ? requestedRange.from
+      : availableRange.from;
+  const end =
+    requestedRange.to < availableRange.to
+      ? requestedRange.to
+      : availableRange.to;
+
+  return start <= end ? { from: start, to: end } : null;
 }
 
 function countToLevel(count: number): number {

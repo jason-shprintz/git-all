@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { APP_USER_AGENT } from '@/lib/app-metadata';
 import { getAuthSessionFromRequest } from '@/lib/auth-session';
+import {
+  normalizeRequestedContributionRange,
+  toExclusiveUpperBoundIso,
+  toStartOfDayIso,
+} from '@/lib/contribution-period';
 
 const GITHUB_GRAPHQL_URL = 'https://api.github.com/graphql';
 const CACHE_TTL_MS = 15 * 60 * 1000;
@@ -167,6 +172,14 @@ export async function GET(request: NextRequest) {
   }
 
   const username = requestedUsername.toLowerCase();
+  const requestedRange = normalizeRequestedRange(request);
+
+  if ('error' in requestedRange) {
+    return NextResponse.json(
+      { error: requestedRange.error },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
 
   const authSession = await getAuthSessionFromRequest(request);
   const authSessionLogin = authSession?.user.login.toLowerCase() ?? null;
@@ -188,9 +201,11 @@ export async function GET(request: NextRequest) {
     const refresh = request.nextUrl.searchParams.get('refresh') === 'true';
     // Keep the key shaped as platform:username so the cache structure can stay
     // consistent if other contribution sources adopt the same strategy later.
-    const cacheKey = `github:${username}`;
+    // Range-specific keys trade some cache locality for correct per-range reuse,
+    // and are still bounded by the global MAX_CACHE_ENTRIES eviction cap.
+    const cacheKey = `github:${username}:${requestedRange.from}:${requestedRange.to}`;
     const inFlightKey = shouldBypassCache
-      ? `github:auth:${authSessionLogin}:${username}:${isSelfLookup ? '1' : '0'}`
+      ? `github:auth:${authSessionLogin}:${username}:${requestedRange.from}:${requestedRange.to}:${isSelfLookup ? '1' : '0'}`
       : cacheKey;
     if (!shouldBypassCache) {
       const cached = getCachedContribution(cacheKey);
@@ -200,10 +215,6 @@ export async function GET(request: NextRequest) {
     }
 
     const loadContribution = async () => {
-      const now = new Date();
-      const oneYearAgo = new Date(now);
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-
       const response = await fetch(GITHUB_GRAPHQL_URL, {
         method: 'POST',
         headers: {
@@ -215,8 +226,8 @@ export async function GET(request: NextRequest) {
           query: CONTRIBUTIONS_QUERY,
           variables: {
             username,
-            from: oneYearAgo.toISOString(),
-            to: now.toISOString(),
+            from: toStartOfDayIso(requestedRange.from),
+            to: toExclusiveUpperBoundIso(requestedRange.to),
           },
         }),
       });
@@ -296,4 +307,19 @@ export async function GET(request: NextRequest) {
       { status: 500, headers: { 'Cache-Control': 'no-store' } },
     );
   }
+}
+
+function normalizeRequestedRange(request: NextRequest):
+  | { from: string; to: string }
+  | {
+      error: string;
+    } {
+  return normalizeRequestedContributionRange(
+    request.nextUrl.searchParams.get('from'),
+    request.nextUrl.searchParams.get('to'),
+    {
+      rangeTooLargeError:
+        'GitHub contribution lookups can span at most 1 year.',
+    },
+  );
 }
