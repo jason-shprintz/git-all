@@ -215,11 +215,7 @@ export function toStartOfDayIso(date: string) {
  * when the date range is already at the boundary.
  */
 export function toExclusiveUpperBoundIso(date: string) {
-  const parsedDate = parseDateInput(date);
-  if (!parsedDate) {
-    throw new Error('Invalid date string. Expected format: YYYY-MM-DD.');
-  }
-
-  parsedDate.setUTCDate(parsedDate.getUTCDate() + 1);
-  return parsedDate.toISOString();
+  const upperBound = new Date(`${date}T00:00:00.000Z`);
+  upperBound.setUTCDate(upperBound.getUTCDate() + 1);
+  return upperBound.toISOString();
 }
