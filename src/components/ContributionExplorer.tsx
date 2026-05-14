@@ -199,6 +199,8 @@ export function ContributionExplorer() {
         }
       }
 
+      // Allocate the request token before publishing this fetch's state so any
+      // older completions are ignored consistently on the next render.
       const requestId = ++requestSequence.current;
       setLastEntries(deduped);
 
