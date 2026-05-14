@@ -77,6 +77,9 @@ export async function GET(request: NextRequest) {
 
     const totalContributions = calendar.reduce((sum, d) => sum + d.count, 0);
 
+    // dateRange reflects the actual slice returned to the client after
+    // intersecting the requested range with GitLab's trailing-year calendar.
+    // The UI uses it to show when older requested dates were truncated.
     return NextResponse.json({
       platform: 'gitlab',
       username,

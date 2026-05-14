@@ -176,7 +176,7 @@ export function ContributionExplorer() {
     const requestRange = rangeOverride ?? selectedRange;
 
     if (!requestRange) {
-      setGlobalError('Select a valid custom date range before searching.');
+      setGlobalError('Select a valid date range before searching.');
       return;
     }
 
