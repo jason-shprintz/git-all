@@ -13,8 +13,8 @@ export interface ContributionDateRange {
 }
 
 interface RequestedContributionRangeOptions {
-  invalidRangeError?: string;
   rangeTooLargeError: string;
+  invalidRangeError?: string;
   today?: Date;
 }
 

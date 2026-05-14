@@ -522,7 +522,11 @@ function isSameRange(
   left: ContributionDateRange | null,
   right: ContributionDateRange | null,
 ) {
-  return left?.from === right?.from && left?.to === right?.to;
+  if (left === null || right === null) {
+    return left === right;
+  }
+
+  return left.from === right.from && left.to === right.to;
 }
 
 function mergeAllContributions(
