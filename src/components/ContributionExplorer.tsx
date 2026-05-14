@@ -266,6 +266,7 @@ export function ContributionExplorer() {
       setGlobalError('Enter at least one username.');
       return;
     }
+    // Anonymous users intentionally stay on the default trailing 12-month view.
     await fetchEntries(entries, DEFAULT_RANGE);
   };
 

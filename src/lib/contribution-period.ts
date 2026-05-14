@@ -121,6 +121,7 @@ export function getContributionDateRange(
       };
     case 'last-30-days':
       return {
+        // Include today plus the preceding 29 days for a 30-day inclusive range.
         from: formatUtcDate(addUtcDays(today, -29)),
         to: formatUtcDate(today),
       };
