@@ -266,7 +266,8 @@ export function ContributionExplorer() {
       setGlobalError('Enter at least one username.');
       return;
     }
-    // Anonymous users intentionally stay on the default trailing 12-month view.
+    // Anonymous users intentionally stay on the default trailing 12-month view
+    // because period selection is only available for authenticated sessions.
     await fetchEntries(entries, DEFAULT_RANGE);
   };
 

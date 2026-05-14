@@ -101,6 +101,8 @@ export function getContributionDateRange(
   period: ContributionPeriod,
   today = getTodayUtc(),
 ): ContributionDateRange {
+  // Calendar-based month/year presets preserve the same day-of-month when
+  // possible and otherwise clamp to the last valid day in the target month.
   switch (period) {
     case 'ytd':
       return {
