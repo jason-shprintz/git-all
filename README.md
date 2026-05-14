@@ -48,8 +48,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - **GitHub contributions** via GraphQL API (server-side requests; OAuth token is encrypted in `httpOnly` session cookie)
 - **GitLab contributions** via public REST API (no auth needed)
-- **Side-by-side view** with platform-specific colors (green for GitHub, orange for GitLab)
-- **Integrated view** that merges both calendars into a single heatmap
+- **Bitbucket contributions** via public REST API aggregation (no auth needed)
+- **Side-by-side view** with platform-specific colors (green for GitHub, orange for GitLab, blue for Bitbucket)
+- **Integrated view** that merges all calendars into a single heatmap
 - **Stats bar** showing per-platform and combined totals
 - **Tooltips** on hover showing exact counts per day
 - **Time-period filters** for logged-in users, including preset ranges and a custom date picker

@@ -34,6 +34,9 @@ const COLOR_KEY_PREFIX: Record<string, string> = {
   gitlab: 'gl-level',
   'gitlab-1': 'gl1-level',
   'gitlab-2': 'gl2-level',
+  bitbucket: 'bb-level',
+  'bitbucket-1': 'bb1-level',
+  'bitbucket-2': 'bb2-level',
   integrated: 'ga-level',
 };
 

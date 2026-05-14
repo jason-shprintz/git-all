@@ -9,6 +9,18 @@ interface StatsBarProps {
 
 const COLLAPSE_THRESHOLD = 4;
 
+const PLATFORM_COLOR: Record<string, string> = {
+  github: 'var(--level-4)',
+  gitlab: 'var(--gl-level-4)',
+  bitbucket: 'var(--bb-level-4)',
+};
+
+const PLATFORM_SHORT_LABEL: Record<string, string> = {
+  github: 'GH',
+  gitlab: 'GL',
+  bitbucket: 'BB',
+};
+
 export function StatsBar({ results }: StatsBarProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -30,13 +42,10 @@ export function StatsBar({ results }: StatsBarProps) {
         <span
           key={r.entry.id}
           style={{
-            color:
-              r.entry.platform === 'github'
-                ? 'var(--level-4)'
-                : 'var(--gl-level-4)',
+            color: PLATFORM_COLOR[r.entry.platform] ?? 'var(--text-primary)',
           }}
         >
-          {r.entry.platform === 'github' ? 'GH' : 'GL'}:{' '}
+          {PLATFORM_SHORT_LABEL[r.entry.platform] ?? 'PL'}:{' '}
           <span style={{ color: 'var(--text-secondary)' }}>
             @{r.entry.username}
           </span>{' '}

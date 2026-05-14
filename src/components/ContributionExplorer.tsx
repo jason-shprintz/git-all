@@ -26,7 +26,7 @@ import type {
 
 /** Map a user's (platform, same-platform index) to a CSS color key. */
 function getColorKey(
-  platform: 'github' | 'gitlab',
+  platform: 'github' | 'gitlab' | 'bitbucket',
   samePlatformIndex: number,
 ): string {
   if (samePlatformIndex === 0) return platform;
@@ -211,36 +211,47 @@ export function ContributionExplorer() {
       try {
         const settled = await Promise.all(
           deduped.map(async (entry): Promise<UserResult> => {
+            let nextResult: UserResult;
             try {
-              const api = entry.platform === 'github' ? 'github' : 'gitlab';
               const params = new URLSearchParams({
                 username: entry.username,
                 from: requestRange.from,
                 to: requestRange.to,
               });
-              const res = await fetch(`/api/${api}?${params.toString()}`);
+              const res = await fetch(
+                `/api/${entry.platform}?${params.toString()}`,
+              );
               const data = await res.json();
               if (data.error) {
-                return { entry, data: null, error: String(data.error) };
+                nextResult = { entry, data: null, error: String(data.error) };
+              } else {
+                nextResult = { entry, data, error: null };
               }
-              return { entry, data, error: null };
             } catch (err) {
-              return {
+              nextResult = {
                 entry,
                 data: null,
                 error: err instanceof Error ? err.message : 'Request failed',
               };
             }
+
+            if (requestId === requestSequence.current) {
+              setResults((currentResults) =>
+                currentResults.map((result) =>
+                  result.entry.id === entry.id ? nextResult : result,
+                ),
+              );
+            }
+
+            return nextResult;
           }),
         );
 
-        if (requestId !== requestSequence.current) {
-          return;
-        }
-
-        setResults(settled);
-
-        if (settled.length > 0 && settled.every((r) => r.error !== null)) {
+        if (
+          requestId === requestSequence.current &&
+          settled.length > 0 &&
+          settled.every((r) => r.error !== null)
+        ) {
           setGlobalError(
             'All lookups failed. Check the usernames and try again.',
           );
@@ -272,6 +283,7 @@ export function ContributionExplorer() {
   const handleSimpleSearch = async (
     githubUsername: string,
     gitlabUsername: string,
+    bitbucketUsername: string,
   ) => {
     const entries: UserEntry[] = [];
     if (githubUsername.trim()) {
@@ -286,6 +298,13 @@ export function ContributionExplorer() {
         id: 'anon-gitlab',
         platform: 'gitlab',
         username: gitlabUsername.trim(),
+      });
+    }
+    if (bitbucketUsername.trim()) {
+      entries.push({
+        id: 'anon-bitbucket',
+        platform: 'bitbucket',
+        username: bitbucketUsername.trim(),
       });
     }
     if (entries.length === 0) {
@@ -364,7 +383,7 @@ export function ContributionExplorer() {
     }
   };
 
-  const hasData = results.some((r) => r.data !== null);
+  const hasResults = results.length > 0;
 
   // Assign each user a color key based on how many same-platform users appear before it.
   const platformCounts: Record<string, number> = {};
@@ -418,7 +437,7 @@ export function ContributionExplorer() {
         </div>
       )}
 
-      {hasData && (
+      {hasResults && (
         <div className="mt-10">
           <div className="flex items-center justify-between mb-6 gap-4">
             <StatsBar results={results} />
@@ -455,8 +474,8 @@ export function ContributionExplorer() {
                     className="text-sm font-medium mb-3"
                     style={{ color: 'var(--text-secondary)' }}
                   >
-                    {result.entry.platform === 'github' ? 'GitHub' : 'GitLab'} —
-                    @{result.entry.username}
+                    {getPlatformLabel(result.entry.platform)} — @
+                    {result.entry.username}
                   </h2>
                   {result.data ? (
                     <>
@@ -484,12 +503,20 @@ export function ContributionExplorer() {
                     <div
                       className="p-4 rounded-lg border text-sm"
                       style={{
-                        borderColor: '#f85149',
-                        color: '#f85149',
-                        backgroundColor: 'rgba(248,81,73,0.1)',
+                        borderColor:
+                          result.error === null ? 'var(--border)' : '#f85149',
+                        color:
+                          result.error === null
+                            ? 'var(--text-secondary)'
+                            : '#f85149',
+                        backgroundColor:
+                          result.error === null
+                            ? 'var(--bg-surface)'
+                            : 'rgba(248,81,73,0.1)',
                       }}
                     >
-                      {result.error ?? 'No data available.'}
+                      {result.error ??
+                        `Loading ${getPlatformLabel(result.entry.platform)} contributions…`}
                     </div>
                   )}
                 </div>
@@ -520,6 +547,12 @@ export function ContributionExplorer() {
       )}
     </>
   );
+}
+
+function getPlatformLabel(platform: 'github' | 'gitlab' | 'bitbucket') {
+  if (platform === 'github') return 'GitHub';
+  if (platform === 'gitlab') return 'GitLab';
+  return 'Bitbucket';
 }
 
 function getDefaultRange() {
