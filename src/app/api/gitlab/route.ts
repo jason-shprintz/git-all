@@ -60,8 +60,12 @@ export async function GET(request: NextRequest) {
 
     const calendar: Array<{ date: string; count: number; level: number }> = [];
     if (effectiveRange) {
-      const cursor = parseDateInput(effectiveRange.from)!;
-      const end = parseDateInput(effectiveRange.to)!;
+      const cursor = parseDateInput(effectiveRange.from);
+      const end = parseDateInput(effectiveRange.to);
+
+      if (!cursor || !end) {
+        throw new Error('Invalid effective GitLab date range.');
+      }
 
       while (cursor <= end) {
         const dateStr = formatUtcDate(cursor);

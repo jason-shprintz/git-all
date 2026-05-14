@@ -204,7 +204,8 @@ export async function GET(request: NextRequest) {
     const refresh = request.nextUrl.searchParams.get('refresh') === 'true';
     // Keep the key shaped as platform:username so the cache structure can stay
     // consistent if other contribution sources adopt the same strategy later.
-    // Range-specific keys are still bounded by the global MAX_CACHE_ENTRIES cap.
+    // Range-specific keys trade some cache locality for correct per-range reuse,
+    // and are still bounded by the global MAX_CACHE_ENTRIES eviction cap.
     const cacheKey = `github:${username}:${requestedRange.from}:${requestedRange.to}`;
     const inFlightKey = shouldBypassCache
       ? `github:auth:${authSessionLogin}:${username}:${requestedRange.from}:${requestedRange.to}:${isSelfLookup ? '1' : '0'}`

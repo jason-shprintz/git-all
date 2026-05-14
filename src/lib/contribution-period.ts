@@ -82,9 +82,8 @@ function addUtcMonths(date: Date, amount: number) {
   const month = date.getUTCMonth() + amount;
   const day = date.getUTCDate();
   const base = new Date(Date.UTC(year, month, 1));
-  base.setUTCDate(
-    Math.min(day, getDaysInUtcMonth(base.getUTCFullYear(), base.getUTCMonth())),
-  );
+  const maxDay = getDaysInUtcMonth(base.getUTCFullYear(), base.getUTCMonth());
+  base.setUTCDate(Math.min(day, maxDay));
   return base;
 }
 
@@ -93,9 +92,8 @@ function addUtcYears(date: Date, amount: number) {
   const month = date.getUTCMonth();
   const day = date.getUTCDate();
   const base = new Date(Date.UTC(year, month, 1));
-  base.setUTCDate(
-    Math.min(day, getDaysInUtcMonth(base.getUTCFullYear(), base.getUTCMonth())),
-  );
+  const maxDay = getDaysInUtcMonth(base.getUTCFullYear(), base.getUTCMonth());
+  base.setUTCDate(Math.min(day, maxDay));
   return base;
 }
 

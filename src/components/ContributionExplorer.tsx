@@ -105,7 +105,7 @@ export function ContributionExplorer() {
 
     return getContributionDateRange(period);
   }, [authenticated, customRange, period]);
-  const appliedVisibleRange = useMemo(() => {
+  const appliedDateRange = useMemo(() => {
     if (authenticated !== true) {
       return DEFAULT_RANGE;
     }
@@ -176,7 +176,7 @@ export function ContributionExplorer() {
     const requestRange = rangeOverride ?? selectedRange;
 
     if (!requestRange) {
-      setGlobalError('Select a valid date range before searching.');
+      setGlobalError('Enter a valid custom date range before searching.');
       return;
     }
 
@@ -412,10 +412,8 @@ export function ContributionExplorer() {
                       {result.data.platform === 'gitlab' &&
                         result.data.dateRange.from &&
                         result.data.dateRange.to &&
-                        (result.data.dateRange.from >
-                          appliedVisibleRange.from ||
-                          result.data.dateRange.to <
-                            appliedVisibleRange.to) && (
+                        (result.data.dateRange.from > appliedDateRange.from ||
+                          result.data.dateRange.to < appliedDateRange.to) && (
                           <p
                             className="mt-2 text-xs"
                             style={{ color: 'var(--text-secondary)' }}
