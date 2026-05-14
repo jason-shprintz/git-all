@@ -231,11 +231,9 @@ function isCommitByUsername(commit: BitbucketCommit, username: string) {
   return raw ? raw.includes(target) : false;
 }
 
-function normalizeRequestedRange(request: NextRequest):
-  | { from: string; to: string }
-  | {
-      error: string;
-    } {
+function normalizeRequestedRange(
+  request: NextRequest,
+): { from: string; to: string } | { error: string } {
   return normalizeRequestedContributionRange(
     request.nextUrl.searchParams.get('from'),
     request.nextUrl.searchParams.get('to'),

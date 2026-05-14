@@ -383,7 +383,7 @@ export function ContributionExplorer() {
     }
   };
 
-  const hasResults = results.length > 0;
+  const hasEntries = results.length > 0;
 
   // Assign each user a color key based on how many same-platform users appear before it.
   const platformCounts: Record<string, number> = {};
@@ -437,7 +437,7 @@ export function ContributionExplorer() {
         </div>
       )}
 
-      {hasResults && (
+      {hasEntries && (
         <div className="mt-10">
           <div className="flex items-center justify-between mb-6 gap-4">
             <StatsBar results={results} />
