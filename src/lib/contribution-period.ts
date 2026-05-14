@@ -13,7 +13,7 @@ export interface ContributionDateRange {
 }
 
 interface RequestedContributionRangeOptions {
-  rangeTooLargeError: string;
+  rangeTooLargeError?: string;
   invalidRangeError?: string;
   /** Override "today" for deterministic tests or request-time date calculations. */
   today?: Date;
@@ -172,7 +172,7 @@ export function normalizeRequestedContributionRange(
   to: string | null,
   {
     invalidRangeError = 'Invalid date range. Provide valid from and to values.',
-    rangeTooLargeError,
+    rangeTooLargeError = 'Contribution lookups can span at most 1 year.',
     today = getTodayUtc(),
   }: RequestedContributionRangeOptions,
 ): ContributionDateRange | { error: string } {

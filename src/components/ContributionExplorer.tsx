@@ -200,10 +200,10 @@ export function ContributionExplorer() {
       }
 
       const requestId = ++requestSequence.current;
-      lastRequestedRange.current = requestRange;
       setLastEntries(deduped);
 
       // Seed results so callers can see per-entry loading state if needed.
+      lastRequestedRange.current = requestRange;
       setResults(deduped.map((entry) => ({ entry, data: null, error: null })));
 
       try {
