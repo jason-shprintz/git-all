@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { AuthStatus } from '@/components/AuthStatus';
 import { ContributionExplorer } from '@/components/ContributionExplorer';
 import { GitAllLogo } from '@/components/GitAllLogo';
@@ -20,7 +21,9 @@ export default function Home() {
 
       <main className="max-w-6xl mx-auto px-4 pb-12">
         <section aria-label="Contribution lookup tool" className="mt-10">
-          <ContributionExplorer />
+          <Suspense fallback={<ContributionExplorerFallback />}>
+            <ContributionExplorer />
+          </Suspense>
         </section>
 
         {/* ── About ─────────────────────────────────────────────── */}
@@ -265,5 +268,19 @@ export default function Home() {
         </p>
       </footer>
     </>
+  );
+}
+
+function ContributionExplorerFallback() {
+  return (
+    <div
+      className="max-w-2xl mx-auto rounded-lg p-4 text-sm"
+      style={{
+        backgroundColor: 'var(--bg-surface)',
+        color: 'var(--text-secondary)',
+      }}
+    >
+      Loading contribution explorer…
+    </div>
   );
 }

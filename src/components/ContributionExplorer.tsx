@@ -1,16 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { ContributionGrid } from '@/components/ContributionGrid';
 import { MultiUserForm } from '@/components/MultiUserForm';
 import { SearchForm } from '@/components/SearchForm';
 import { StatsBar } from '@/components/StatsBar';
+import { TimePeriodSelector } from '@/components/TimePeriodSelector';
+import {
+  DEFAULT_CONTRIBUTION_PERIOD,
+  getContributionDateRange,
+  getPeriodSelectionFromSearchParams,
+  getTodayUtc,
+  isRangeWithinOneYear,
+  normalizeCustomDateRange,
+  type ContributionDateRange,
+  type ContributionPeriod,
+} from '@/lib/contribution-period';
 import type {
   ContributionData,
   UserEntry,
   UserResult,
   ViewMode,
 } from '@/lib/types';
+
+const DEFAULT_RANGE = getContributionDateRange(
+  DEFAULT_CONTRIBUTION_PERIOD,
+  getTodayUtc(),
+);
 
 /** Map a user's (platform, same-platform index) to a CSS color key. */
 function getColorKey(
@@ -24,12 +41,23 @@ function getColorKey(
 }
 
 export function ContributionExplorer() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   // null = auth check in progress; true/false once resolved
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [results, setResults] = useState<UserResult[]>([]);
+  const [lastEntries, setLastEntries] = useState<UserEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [rangeError, setRangeError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('side-by-side');
+  const [period, setPeriod] = useState<ContributionPeriod>(
+    DEFAULT_CONTRIBUTION_PERIOD,
+  );
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -46,21 +74,132 @@ export function ContributionExplorer() {
     };
   }, []);
 
+  useEffect(() => {
+    if (authenticated !== true) {
+      return;
+    }
+
+    const selection = getPeriodSelectionFromSearchParams(searchParams);
+    setPeriod(selection.period);
+    setCustomFrom(selection.customFrom);
+    setCustomTo(selection.customTo);
+  }, [authenticated, searchParams]);
+
+  const customRange = useMemo(
+    () => normalizeCustomDateRange(customFrom, customTo),
+    [customFrom, customTo],
+  );
+  const appliedSelection = useMemo(
+    () => getPeriodSelectionFromSearchParams(searchParams),
+    [searchParams],
+  );
+
+  const selectedRange = useMemo(() => {
+    if (authenticated !== true) {
+      return DEFAULT_RANGE;
+    }
+
+    if (period === 'custom') {
+      return customRange;
+    }
+
+    return getContributionDateRange(period);
+  }, [authenticated, customRange, period]);
+  const appliedVisibleRange = useMemo(() => {
+    if (authenticated !== true) {
+      return DEFAULT_RANGE;
+    }
+
+    if (appliedSelection.period === 'custom') {
+      return (
+        normalizeCustomDateRange(
+          appliedSelection.customFrom,
+          appliedSelection.customTo,
+        ) ?? DEFAULT_RANGE
+      );
+    }
+
+    return getContributionDateRange(appliedSelection.period);
+  }, [appliedSelection, authenticated]);
+
+  useEffect(() => {
+    if (authenticated !== true || period !== 'custom') {
+      setRangeError(null);
+      return;
+    }
+
+    if (!customFrom && !customTo) {
+      setRangeError(null);
+      return;
+    }
+
+    if (!customRange) {
+      setRangeError('Enter a valid custom date range.');
+      return;
+    }
+
+    if (!isRangeWithinOneYear(customRange)) {
+      setRangeError('Custom ranges can span at most 1 year.');
+      return;
+    }
+
+    setRangeError(null);
+  }, [authenticated, customFrom, customRange, customTo, period]);
+
+  const updatePeriodInUrl = (
+    nextPeriod: ContributionPeriod,
+    nextRange: ContributionDateRange | null,
+  ) => {
+    const nextSearchParams = new URLSearchParams(searchParams.toString());
+    nextSearchParams.delete('period');
+    nextSearchParams.delete('from');
+    nextSearchParams.delete('to');
+
+    if (nextPeriod === 'custom' && nextRange) {
+      nextSearchParams.set('from', nextRange.from);
+      nextSearchParams.set('to', nextRange.to);
+    } else if (nextPeriod !== DEFAULT_CONTRIBUTION_PERIOD) {
+      nextSearchParams.set('period', nextPeriod);
+    }
+
+    const query = nextSearchParams.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, {
+      scroll: false,
+    });
+  };
+
   /** Shared fetch logic used by both form variants. */
-  const fetchEntries = async (entries: UserEntry[]) => {
+  const fetchEntries = async (
+    entries: UserEntry[],
+    rangeOverride?: ContributionDateRange,
+  ) => {
+    const requestRange = rangeOverride ?? selectedRange;
+
+    if (!requestRange) {
+      setGlobalError('Select a valid custom date range before searching.');
+      return;
+    }
+
+    if (!isRangeWithinOneYear(requestRange)) {
+      setGlobalError('Date ranges can span at most 1 year.');
+      return;
+    }
+
     setLoading(true);
     setGlobalError(null);
 
     // Deduplicate by platform + lowercase username; keep first occurrence.
     const seen = new Set<string>();
     const deduped: UserEntry[] = [];
-    for (const e of entries) {
-      const key = `${e.platform}:${e.username.toLowerCase()}`;
+    for (const entry of entries) {
+      const key = `${entry.platform}:${entry.username.toLowerCase()}`;
       if (!seen.has(key)) {
         seen.add(key);
-        deduped.push(e);
+        deduped.push(entry);
       }
     }
+
+    setLastEntries(deduped);
 
     // Seed results so callers can see per-entry loading state if needed.
     setResults(deduped.map((entry) => ({ entry, data: null, error: null })));
@@ -70,9 +209,12 @@ export function ContributionExplorer() {
         deduped.map(async (entry): Promise<UserResult> => {
           try {
             const api = entry.platform === 'github' ? 'github' : 'gitlab';
-            const res = await fetch(
-              `/api/${api}?username=${encodeURIComponent(entry.username)}`,
-            );
+            const params = new URLSearchParams({
+              username: entry.username,
+              from: requestRange.from,
+              to: requestRange.to,
+            });
+            const res = await fetch(`/api/${api}?${params.toString()}`);
             const data = await res.json();
             if (data.error) {
               return { entry, data: null, error: String(data.error) };
@@ -124,26 +266,85 @@ export function ContributionExplorer() {
       setGlobalError('Enter at least one username.');
       return;
     }
-    await fetchEntries(entries);
+    await fetchEntries(entries, DEFAULT_RANGE);
+  };
+
+  const handlePeriodChange = (nextPeriod: ContributionPeriod) => {
+    setPeriod(nextPeriod);
+    setGlobalError(null);
+
+    if (nextPeriod === 'custom' || authenticated !== true) {
+      return;
+    }
+
+    const nextRange = getContributionDateRange(nextPeriod);
+    updatePeriodInUrl(nextPeriod, nextRange);
+
+    if (lastEntries.length > 0) {
+      void fetchEntries(lastEntries, nextRange);
+    }
+  };
+
+  const handleApplyCustomRange = () => {
+    if (authenticated !== true) {
+      return;
+    }
+
+    if (!customRange) {
+      setRangeError('Enter a valid custom date range.');
+      return;
+    }
+
+    if (!isRangeWithinOneYear(customRange)) {
+      setRangeError('Custom ranges can span at most 1 year.');
+      return;
+    }
+
+    setGlobalError(null);
+    updatePeriodInUrl('custom', customRange);
+
+    if (lastEntries.length > 0) {
+      void fetchEntries(lastEntries, customRange);
+    }
   };
 
   const hasData = results.some((r) => r.data !== null);
 
   // Assign each user a color key based on how many same-platform users appear before it.
   const platformCounts: Record<string, number> = {};
-  const resultsWithColorKey = results.map((r) => {
-    const platform = r.entry.platform;
-    const idx = platformCounts[platform] ?? 0;
-    platformCounts[platform] = idx + 1;
-    return { ...r, colorKey: getColorKey(platform, idx) };
+  const resultsWithColorKey = results.map((result) => {
+    const platform = result.entry.platform;
+    const index = platformCounts[platform] ?? 0;
+    platformCounts[platform] = index + 1;
+    return { ...result, colorKey: getColorKey(platform, index) };
   });
 
   const showMultiUser = authenticated === true;
+  const showGitlabLimitNote =
+    showMultiUser &&
+    (period === 'last-year' ||
+      (period === 'custom' &&
+        customRange !== null &&
+        customRange.from < DEFAULT_RANGE.from));
 
   return (
     <>
       {showMultiUser ? (
-        <MultiUserForm onSearch={fetchEntries} loading={loading} />
+        <>
+          <MultiUserForm onSearch={fetchEntries} loading={loading} />
+          <TimePeriodSelector
+            period={period}
+            customFrom={customFrom}
+            customTo={customTo}
+            loading={loading}
+            error={rangeError}
+            showGitlabLimitNote={showGitlabLimitNote}
+            onPeriodChange={handlePeriodChange}
+            onCustomFromChange={setCustomFrom}
+            onCustomToChange={setCustomTo}
+            onApplyCustomRange={handleApplyCustomRange}
+          />
+        </>
       ) : (
         <SearchForm onSearch={handleSimpleSearch} loading={loading} />
       )}
@@ -163,10 +364,10 @@ export function ContributionExplorer() {
 
       {hasData && (
         <div className="mt-10">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 gap-4">
             <StatsBar results={results} />
             <div
-              className="flex gap-1 p-1 rounded-lg"
+              className="flex gap-1 p-1 rounded-lg shrink-0"
               style={{ backgroundColor: 'var(--bg-surface)' }}
             >
               {(['side-by-side', 'integrated'] as ViewMode[]).map((mode) => (
@@ -192,17 +393,39 @@ export function ContributionExplorer() {
 
           {viewMode === 'side-by-side' ? (
             <div className="space-y-8">
-              {resultsWithColorKey.map((r) => (
-                <div key={r.entry.id}>
+              {resultsWithColorKey.map((result) => (
+                <div key={result.entry.id}>
                   <h2
                     className="text-sm font-medium mb-3"
                     style={{ color: 'var(--text-secondary)' }}
                   >
-                    {r.entry.platform === 'github' ? 'GitHub' : 'GitLab'} — @
-                    {r.entry.username}
+                    {result.entry.platform === 'github' ? 'GitHub' : 'GitLab'} —
+                    @{result.entry.username}
                   </h2>
-                  {r.data ? (
-                    <ContributionGrid data={r.data} colorKey={r.colorKey} />
+                  {result.data ? (
+                    <>
+                      <ContributionGrid
+                        data={result.data}
+                        colorKey={result.colorKey}
+                      />
+                      {result.data.platform === 'gitlab' &&
+                        result.data.dateRange.from &&
+                        result.data.dateRange.to &&
+                        (result.data.dateRange.from >
+                          appliedVisibleRange.from ||
+                          result.data.dateRange.to <
+                            appliedVisibleRange.to) && (
+                          <p
+                            className="mt-2 text-xs"
+                            style={{ color: 'var(--text-secondary)' }}
+                          >
+                            GitLab only returned data from{' '}
+                            <strong>{result.data.dateRange.from}</strong> to{' '}
+                            <strong>{result.data.dateRange.to}</strong> for this
+                            lookup.
+                          </p>
+                        )}
+                    </>
                   ) : (
                     <div
                       className="p-4 rounded-lg border text-sm"
@@ -212,7 +435,7 @@ export function ContributionExplorer() {
                         backgroundColor: 'rgba(248,81,73,0.1)',
                       }}
                     >
-                      {r.error ?? 'No data available.'}
+                      {result.error ?? 'No data available.'}
                     </div>
                   )}
                 </div>
@@ -225,14 +448,16 @@ export function ContributionExplorer() {
                 style={{ color: 'var(--text-secondary)' }}
               >
                 Combined Activity
-                {results.filter((r) => r.data).length > 0 &&
+                {results.filter((result) => result.data).length > 0 &&
                   ` \u2014 ${results
-                    .filter((r) => r.data)
-                    .map((r) => `@${r.entry.username}`)
+                    .filter((result) => result.data)
+                    .map((result) => `@${result.entry.username}`)
                     .join(' + ')}`}
               </h2>
               <ContributionGrid
-                data={mergeAllContributions(results.map((r) => r.data))}
+                data={mergeAllContributions(
+                  results.map((result) => result.data),
+                )}
                 colorKey="integrated"
               />
             </div>
@@ -259,13 +484,13 @@ function mergeAllContributions(
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, count]) => ({ date, count, level: countToLevel(count) }));
 
-  const totalContributions = calendar.reduce((sum, d) => sum + d.count, 0);
+  const totalContributions = calendar.reduce((sum, day) => sum + day.count, 0);
 
   return {
     platform: 'integrated',
     username: sources
-      .filter((d): d is ContributionData => d !== null)
-      .map((d) => d.username)
+      .filter((data): data is ContributionData => data !== null)
+      .map((data) => data.username)
       .join(' + '),
     totalContributions,
     dateRange: {
