@@ -56,6 +56,11 @@ export function ContributionExplorer() {
   const requestSequence = useRef(0);
   const lastRequestedRange = useRef<ContributionDateRange | null>(null);
 
+  const invalidatePendingRequests = () => {
+    requestSequence.current += 1;
+    setLoading(false);
+  };
+
   useEffect(() => {
     let isMounted = true;
     fetch('/api/auth/session', { cache: 'no-store' })
@@ -252,6 +257,8 @@ export function ContributionExplorer() {
       return;
     }
 
+    // Skip redundant refetches when the URL-backed applied range already
+    // matches the range for the most recent in-flight or rendered lookup.
     if (isSameRange(lastRequestedRange.current, appliedDateRange)) {
       return;
     }
@@ -316,10 +323,7 @@ export function ContributionExplorer() {
     setGlobalError(null);
 
     if (nextPeriod === 'custom') {
-      // Bump the request token so any slower preset lookup is ignored after the
-      // UI switches to an unapplied custom selection.
-      requestSequence.current += 1;
-      setLoading(false);
+      invalidatePendingRequests();
       return;
     }
 

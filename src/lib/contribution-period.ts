@@ -15,6 +15,7 @@ export interface ContributionDateRange {
 interface RequestedContributionRangeOptions {
   rangeTooLargeError: string;
   invalidRangeError?: string;
+  /** Override "today" for deterministic tests or request-time date calculations. */
   today?: Date;
 }
 
