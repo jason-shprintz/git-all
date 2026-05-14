@@ -54,7 +54,7 @@ export function ContributionExplorer() {
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
   const requestSequence = useRef(0);
-  const lastFetchedRange = useRef<ContributionDateRange | null>(null);
+  const lastRequestedRange = useRef<ContributionDateRange | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -195,7 +195,7 @@ export function ContributionExplorer() {
       }
 
       const requestId = ++requestSequence.current;
-      lastFetchedRange.current = requestRange;
+      lastRequestedRange.current = requestRange;
       setLastEntries(deduped);
 
       // Seed results so callers can see per-entry loading state if needed.
@@ -252,7 +252,7 @@ export function ContributionExplorer() {
       return;
     }
 
-    if (isSameRange(lastFetchedRange.current, appliedDateRange)) {
+    if (isSameRange(lastRequestedRange.current, appliedDateRange)) {
       return;
     }
 
@@ -316,6 +316,8 @@ export function ContributionExplorer() {
     setGlobalError(null);
 
     if (nextPeriod === 'custom') {
+      // Bump the request token so any slower preset lookup is ignored after the
+      // UI switches to an unapplied custom selection.
       requestSequence.current += 1;
       setLoading(false);
       return;
