@@ -61,14 +61,14 @@
   --gl-level-4: #fd9a28;
 
   /* Bitbucket-style Atlassian blues */
-  --bb-level-0: #161b22;
+  --bb-level-0: #21262d;
   --bb-level-1: #0a2342;
   --bb-level-2: #0747a6;
   --bb-level-3: #2684ff;
   --bb-level-4: #4c9aff;
 
   /* Gitea / Forgejo violets */
-  --gt-level-0: #161b22;
+  --gt-level-0: #21262d;
   --gt-level-1: #2d1450;
   --gt-level-2: #5b2d8e;
   --gt-level-3: #8b5cf6;
@@ -281,13 +281,13 @@
   --gl-level-3: #c96800;
   --gl-level-4: #fd9a28;
 
-  --bb-level-0: #161b22;
+  --bb-level-0: #21262d;
   --bb-level-1: #0a2342;
   --bb-level-2: #0747a6;
   --bb-level-3: #2684ff;
   --bb-level-4: #4c9aff;
 
-  --gt-level-0: #161b22;
+  --gt-level-0: #21262d;
   --gt-level-1: #2d1450;
   --gt-level-2: #5b2d8e;
   --gt-level-3: #8b5cf6;
