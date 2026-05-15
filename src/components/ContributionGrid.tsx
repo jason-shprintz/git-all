@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContributionData } from '@/lib/types';
 
 interface ContributionGridProps {
@@ -49,11 +49,29 @@ function getLevelColor(level: number, colorKey: string): string {
 }
 
 export function ContributionGrid({ data, colorKey }: ContributionGridProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<{
     x: number;
     y: number;
     text: string;
   } | null>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (el) {
+      el.scrollLeft = el.scrollWidth;
+    }
+    // Use stable primitive fields instead of the object reference so the
+    // effect doesn't re-fire on every render when the parent recreates the
+    // ContributionData object (e.g. the integrated view's mergeAllContributions).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    data.platform,
+    data.username,
+    data.totalContributions,
+    data.dateRange.from,
+    data.dateRange.to,
+  ]);
 
   const { weeks, monthHeaders } = useMemo(() => {
     const calendar = data.calendar;
@@ -105,6 +123,7 @@ export function ContributionGrid({ data, colorKey }: ContributionGridProps) {
 
   return (
     <div
+      ref={containerRef}
       className="overflow-x-auto rounded-lg p-4"
       style={{ backgroundColor: 'var(--bg-surface)' }}
     >
