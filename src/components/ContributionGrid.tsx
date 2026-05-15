@@ -116,7 +116,7 @@ export function ContributionGrid({ data, colorKey }: ContributionGridProps) {
   return (
     <div
       ref={containerRef}
-      className="overflow-x-auto rounded-lg p-4"
+      className="overflow-x-auto rounded-lg p-4 w-fit max-w-full"
       style={{ backgroundColor: 'var(--bg-surface)' }}
     >
       <svg
