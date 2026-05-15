@@ -58,7 +58,7 @@ export function ThemeToggle() {
 
   return (
     <div
-      className="fixed top-4 right-4 z-50 flex gap-1 p-1 rounded-lg"
+      className="flex gap-1 p-1 rounded-lg"
       style={{
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border)',
