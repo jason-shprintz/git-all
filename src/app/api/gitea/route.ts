@@ -14,6 +14,9 @@ interface GiteaHeatmapEntry {
   contributions: number;
 }
 
+const UPSTREAM_TIMEOUT_MS = 8_000;
+const MAX_UPSTREAM_JSON_BYTES = 512 * 1024;
+
 function countToLevel(count: number): number {
   if (count === 0) return 0;
   if (count <= 3) return 1;
@@ -64,6 +67,7 @@ export async function GET(request: NextRequest) {
       `${normalizedInstanceUrl}/api/v1/users/${encodedUser}`,
       {
         headers: { 'User-Agent': APP_USER_AGENT },
+        signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
       },
     );
 
@@ -82,6 +86,7 @@ export async function GET(request: NextRequest) {
       `${normalizedInstanceUrl}/api/v1/users/${encodedUser}/heatmap`,
       {
         headers: { 'User-Agent': APP_USER_AGENT },
+        signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
       },
     );
 
@@ -89,7 +94,10 @@ export async function GET(request: NextRequest) {
       throw new Error(`Gitea heatmap API returned ${heatmapResponse.status}`);
     }
 
-    const heatmap: GiteaHeatmapEntry[] = await heatmapResponse.json();
+    const heatmap = await parseLimitedJson<GiteaHeatmapEntry[]>(
+      heatmapResponse,
+      MAX_UPSTREAM_JSON_BYTES,
+    );
     const contributionMap = new Map<string, number>();
 
     for (const item of heatmap) {
@@ -140,12 +148,51 @@ export async function GET(request: NextRequest) {
       { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error) {
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      return NextResponse.json(
+        { error: 'Gitea/Forgejo request timed out.' },
+        { status: 504, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+
     const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
       { error: message },
       { status: 500, headers: { 'Cache-Control': 'no-store' } },
     );
   }
+}
+
+async function parseLimitedJson<T>(response: Response, maxBytes: number) {
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error('Upstream response body was empty.');
+  }
+
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+
+    totalBytes += value.byteLength;
+    if (totalBytes > maxBytes) {
+      throw new Error('Upstream response exceeded size limit.');
+    }
+    chunks.push(value);
+  }
+
+  const merged = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  const text = new TextDecoder().decode(merged);
+  return JSON.parse(text) as T;
 }
 
 function normalizeRequestedRange(

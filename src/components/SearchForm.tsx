@@ -35,13 +35,7 @@ export function SearchForm({ onSearch, loading }: SearchFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(
-      github,
-      gitlab,
-      bitbucket,
-      gitea,
-      giteaInstanceUrl.trim() || DEFAULT_GITEA_INSTANCE_URL,
-    );
+    onSearch(github, gitlab, bitbucket, gitea, giteaInstanceUrl.trim());
   };
 
   return (
@@ -184,6 +178,7 @@ export function SearchForm({ onSearch, loading }: SearchFormProps) {
               value={customGiteaInstance}
               onChange={(e) => setCustomGiteaInstance(e.target.value)}
               placeholder="https://codeberg.org"
+              required={Boolean(gitea.trim())}
               className="w-full px-3 py-2 rounded-lg text-sm outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--bg-surface)',

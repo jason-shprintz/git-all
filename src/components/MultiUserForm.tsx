@@ -57,13 +57,7 @@ export function MultiUserForm({ onSearch, loading }: MultiUserFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const valid = entries
-      .filter((entry) => entry.username.trim())
-      .map((entry) =>
-        entry.platform === 'gitea' && !entry.instanceUrl?.trim()
-          ? { ...entry, instanceUrl: DEFAULT_GITEA_INSTANCE_URL }
-          : entry,
-      );
+    const valid = entries.filter((entry) => entry.username.trim());
     if (valid.length === 0) return;
     onSearch(valid);
   };
@@ -175,6 +169,7 @@ export function MultiUserForm({ onSearch, loading }: MultiUserFormProps) {
                         updateEntry(entry.id, { instanceUrl: e.target.value })
                       }
                       placeholder="https://codeberg.org"
+                      required={Boolean(entry.username.trim())}
                       className="px-3 py-2 rounded-lg text-sm outline-none transition-colors"
                       style={{
                         backgroundColor: 'var(--bg-surface)',

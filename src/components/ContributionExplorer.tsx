@@ -17,11 +17,7 @@ import {
   type ContributionDateRange,
   type ContributionPeriod,
 } from '@/lib/contribution-period';
-import {
-  DEFAULT_GITEA_INSTANCE_URL,
-  getInstanceName,
-  normalizeInstanceUrl,
-} from '@/lib/gitea';
+import { getInstanceName, normalizeInstanceUrl } from '@/lib/gitea';
 import type {
   ContributionData,
   UserEntry,
@@ -318,11 +314,15 @@ export function ContributionExplorer() {
       });
     }
     if (giteaUsername.trim()) {
+      if (!giteaInstanceUrl.trim()) {
+        setGlobalError('Enter a Gitea / Forgejo instance URL.');
+        return;
+      }
       entries.push({
         id: 'anon-gitea',
         platform: 'gitea',
         username: giteaUsername.trim(),
-        instanceUrl: giteaInstanceUrl.trim() || DEFAULT_GITEA_INSTANCE_URL,
+        instanceUrl: giteaInstanceUrl.trim(),
       });
     }
     if (entries.length === 0) {
