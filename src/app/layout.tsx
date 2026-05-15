@@ -1,4 +1,3 @@
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { FAQ_ITEMS } from '@/lib/faq';
 import './globals.css';
 import type { Metadata } from 'next';
@@ -96,10 +95,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className="min-h-screen antialiased">
-        <ThemeToggle />
-        {children}
-      </body>
+      <body className="min-h-screen antialiased">{children}</body>
     </html>
   );
 }
