@@ -60,6 +60,13 @@
   --gl-level-3: #c96800;
   --gl-level-4: #fd9a28;
 
+  /* Bitbucket-style Atlassian blues */
+  --bb-level-0: #161b22;
+  --bb-level-1: #0a2342;
+  --bb-level-2: #0747a6;
+  --bb-level-3: #2684ff;
+  --bb-level-4: #4c9aff;
+
   /* git-all integrated view — cyans */
   --ga-level-0: #21262d;
   --ga-level-1: #064e3b;
@@ -94,6 +101,20 @@
   --gl2-level-2: #92400e;
   --gl2-level-3: #d97706;
   --gl2-level-4: #fbbf24;
+
+  /* 2nd Bitbucket user — cool cyans */
+  --bb1-level-0: #161b22;
+  --bb1-level-1: #0c3b4f;
+  --bb1-level-2: #0e7490;
+  --bb1-level-3: #06b6d4;
+  --bb1-level-4: #67e8f9;
+
+  /* 3rd Bitbucket user — deep indigos */
+  --bb2-level-0: #161b22;
+  --bb2-level-1: #1e1b4b;
+  --bb2-level-2: #3730a3;
+  --bb2-level-3: #4f46e5;
+  --bb2-level-4: #818cf8;
 }
 
 /* Manual light override */
@@ -133,6 +154,12 @@
   --gl-level-3: #e08300;
   --gl-level-4: #b35900;
 
+  --bb-level-0: #ebedf0;
+  --bb-level-1: #dbeafe;
+  --bb-level-2: #74a7ff;
+  --bb-level-3: #2684ff;
+  --bb-level-4: #0550ae;
+
   --ga-level-0: #ebedf0;
   --ga-level-1: #b2f0e8;
   --ga-level-2: #2dd4bf;
@@ -166,6 +193,18 @@
   --gl2-level-2: #fbbf24;
   --gl2-level-3: #d97706;
   --gl2-level-4: #92400e;
+
+  --bb1-level-0: #ebedf0;
+  --bb1-level-1: #cffafe;
+  --bb1-level-2: #67e8f9;
+  --bb1-level-3: #0891b2;
+  --bb1-level-4: #155e75;
+
+  --bb2-level-0: #ebedf0;
+  --bb2-level-1: #e0e7ff;
+  --bb2-level-2: #a5b4fc;
+  --bb2-level-3: #6366f1;
+  --bb2-level-4: #3730a3;
 }
 
 /* Manual dark override */
@@ -205,6 +244,12 @@
   --gl-level-3: #c96800;
   --gl-level-4: #fd9a28;
 
+  --bb-level-0: #161b22;
+  --bb-level-1: #0a2342;
+  --bb-level-2: #0747a6;
+  --bb-level-3: #2684ff;
+  --bb-level-4: #4c9aff;
+
   --ga-level-0: #21262d;
   --ga-level-1: #064e3b;
   --ga-level-2: #0d9488;
@@ -238,6 +283,18 @@
   --gl2-level-2: #92400e;
   --gl2-level-3: #d97706;
   --gl2-level-4: #fbbf24;
+
+  --bb1-level-0: #161b22;
+  --bb1-level-1: #0c3b4f;
+  --bb1-level-2: #0e7490;
+  --bb1-level-3: #06b6d4;
+  --bb1-level-4: #67e8f9;
+
+  --bb2-level-0: #161b22;
+  --bb2-level-1: #1e1b4b;
+  --bb2-level-2: #3730a3;
+  --bb2-level-3: #4f46e5;
+  --bb2-level-4: #818cf8;
 }
 
 /* System preference: light (when no manual choice has been set) */
@@ -278,6 +335,12 @@
     --gl-level-3: #e08300;
     --gl-level-4: #b35900;
 
+    --bb-level-0: #ebedf0;
+    --bb-level-1: #dbeafe;
+    --bb-level-2: #74a7ff;
+    --bb-level-3: #2684ff;
+    --bb-level-4: #0550ae;
+
     --ga-level-0: #ebedf0;
     --ga-level-1: #b2f0e8;
     --ga-level-2: #2dd4bf;
@@ -311,6 +374,18 @@
     --gl2-level-2: #fbbf24;
     --gl2-level-3: #d97706;
     --gl2-level-4: #92400e;
+
+    --bb1-level-0: #ebedf0;
+    --bb1-level-1: #cffafe;
+    --bb1-level-2: #67e8f9;
+    --bb1-level-3: #0891b2;
+    --bb1-level-4: #155e75;
+
+    --bb2-level-0: #ebedf0;
+    --bb2-level-1: #e0e7ff;
+    --bb2-level-2: #a5b4fc;
+    --bb2-level-3: #6366f1;
+    --bb2-level-4: #3730a3;
   }
 }
 

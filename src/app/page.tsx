@@ -12,7 +12,7 @@ export default function Home() {
           <GitAllLogo />
         </h1>
         <p style={{ color: 'var(--text-secondary)' }}>
-          See GitHub &amp; GitLab contributions in one place.
+          See GitHub, GitLab &amp; Bitbucket contributions in one place.
         </p>
         <div className="mt-3 flex justify-center">
           <AuthStatus />
@@ -44,8 +44,8 @@ export default function Home() {
             style={{ color: 'var(--text-secondary)' }}
           >
             GitAll is a free developer tool that aggregates your contribution
-            graphs from GitHub and GitLab into one unified heatmap. Bitbucket
-            and Gitea/Forgejo support is coming soon. Enter your username on any
+            graphs from GitHub, GitLab, and Bitbucket into one unified heatmap.
+            Gitea/Forgejo support is coming soon. Enter your username on any
             supported platform and instantly see your combined git activity — no
             account needed.
           </p>
@@ -79,8 +79,8 @@ export default function Home() {
                 1
               </span>
               <span>
-                Enter your GitHub username, GitLab username, or both in the
-                search form above.
+                Enter your GitHub, GitLab, Bitbucket, or multiple usernames in
+                the search form above.
               </span>
             </li>
             <li className="flex gap-3">
@@ -145,7 +145,6 @@ export default function Home() {
                 name: 'Bitbucket',
                 desc: "Atlassian's git collaboration platform",
                 color: 'var(--bb-accent)',
-                soon: true,
               },
               {
                 name: 'Gitea / Forgejo',

@@ -19,7 +19,7 @@ export type ViewMode = 'side-by-side' | 'integrated';
 
 export interface UserEntry {
   id: string;
-  platform: 'github' | 'gitlab';
+  platform: 'github' | 'gitlab' | 'bitbucket';
   username: string;
 }
 

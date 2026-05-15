@@ -1,17 +1,19 @@
 export const FAQ_ITEMS = [
   {
-    question: 'How do I see my GitHub and GitLab contributions in one place?',
+    question:
+      'How do I see my GitHub, GitLab, and Bitbucket contributions in one place?',
     answer:
-      'GitAll (gitall.app) lets you enter usernames from both platforms and instantly view a unified heatmap showing your combined contribution activity.',
+      'GitAll (gitall.app) lets you enter usernames from all three platforms and instantly view a unified heatmap showing your combined contribution activity.',
   },
   {
     question:
-      'Is there a tool to combine GitHub and GitLab contribution graphs?',
+      'Is there a tool to combine GitHub, GitLab, and Bitbucket contribution graphs?',
     answer:
-      'Yes — GitAll merges contribution calendars from GitHub and GitLab into a single unified view. Bitbucket and Gitea/Forgejo support is coming soon.',
+      'Yes — GitAll merges contribution calendars from GitHub, GitLab, and Bitbucket into a single unified view. Gitea/Forgejo support is coming soon.',
   },
   {
-    question: 'Can I compare developer activity across GitHub and GitLab?',
+    question:
+      'Can I compare developer activity across GitHub, GitLab, and Bitbucket?',
     answer:
       'GitAll shows both a side-by-side view (separate heatmaps per platform) and an integrated view that merges all activity into one combined contribution graph.',
   },

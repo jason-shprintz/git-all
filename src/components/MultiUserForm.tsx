@@ -16,7 +16,7 @@ function nextId(): string {
 }
 
 function createEntry(
-  platform: 'github' | 'gitlab' = 'github',
+  platform: 'github' | 'gitlab' | 'bitbucket' = 'github',
   username = '',
 ): UserEntry {
   return { id: nextId(), platform, username };
@@ -63,7 +63,7 @@ export function MultiUserForm({ onSearch, loading }: MultiUserFormProps) {
               value={entry.platform}
               onChange={(e) =>
                 updateEntry(entry.id, {
-                  platform: e.target.value as 'github' | 'gitlab',
+                  platform: e.target.value as 'github' | 'gitlab' | 'bitbucket',
                 })
               }
               className="px-2 py-2 rounded-lg text-sm outline-none transition-colors cursor-pointer"
@@ -76,6 +76,7 @@ export function MultiUserForm({ onSearch, loading }: MultiUserFormProps) {
             >
               <option value="github">GitHub</option>
               <option value="gitlab">GitLab</option>
+              <option value="bitbucket">Bitbucket</option>
             </select>
             <input
               type="text"
@@ -83,7 +84,13 @@ export function MultiUserForm({ onSearch, loading }: MultiUserFormProps) {
               onChange={(e) =>
                 updateEntry(entry.id, { username: e.target.value })
               }
-              placeholder={entry.platform === 'github' ? 'octocat' : 'johndoe'}
+              placeholder={
+                entry.platform === 'github'
+                  ? 'octocat'
+                  : entry.platform === 'gitlab'
+                    ? 'johndoe'
+                    : 'atlassian'
+              }
               className="flex-1 px-3 py-2 rounded-lg text-sm outline-none transition-colors"
               style={{
                 backgroundColor: 'var(--bg-surface)',
