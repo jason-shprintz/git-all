@@ -61,7 +61,17 @@ export function ContributionGrid({ data, colorKey }: ContributionGridProps) {
     if (el) {
       el.scrollLeft = el.scrollWidth;
     }
-  }, [data]);
+    // Use stable primitive fields instead of the object reference so the
+    // effect doesn't re-fire on every render when the parent recreates the
+    // ContributionData object (e.g. the integrated view's mergeAllContributions).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    data.platform,
+    data.username,
+    data.totalContributions,
+    data.dateRange.from,
+    data.dateRange.to,
+  ]);
 
   const { weeks, monthHeaders } = useMemo(() => {
     const calendar = data.calendar;
