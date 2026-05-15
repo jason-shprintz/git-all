@@ -5,17 +5,18 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'GitAll — View GitHub & GitLab Contributions in One Place',
+  title: 'GitAll — View GitHub, GitLab & Bitbucket Contributions in One Place',
   description:
-    'GitAll lets you see GitHub and GitLab contribution graphs in one unified heatmap. Free, no login required.',
+    'GitAll lets you see GitHub, GitLab, and Bitbucket contribution graphs in one unified heatmap. Free, no login required.',
   metadataBase: new URL('https://gitall.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'GitAll — View GitHub & GitLab Contributions in One Place',
+    title:
+      'GitAll — View GitHub, GitLab & Bitbucket Contributions in One Place',
     description:
-      'GitAll lets you see GitHub and GitLab contribution graphs in one unified heatmap. Free, no login required.',
+      'GitAll lets you see GitHub, GitLab, and Bitbucket contribution graphs in one unified heatmap. Free, no login required.',
     url: 'https://gitall.app',
     siteName: 'GitAll',
     locale: 'en_US',
@@ -23,9 +24,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GitAll — View GitHub & GitLab Contributions in One Place',
+    title:
+      'GitAll — View GitHub, GitLab & Bitbucket Contributions in One Place',
     description:
-      'GitAll lets you see GitHub and GitLab contribution graphs in one unified heatmap. Free, no login required.',
+      'GitAll lets you see GitHub, GitLab, and Bitbucket contribution graphs in one unified heatmap. Free, no login required.',
   },
   icons: {
     icon: [
@@ -55,7 +57,7 @@ const structuredData = [
     name: 'GitAll',
     url: 'https://gitall.app',
     description:
-      'See GitHub and GitLab contributions in one unified heatmap. Free, no login required.',
+      'See GitHub, GitLab, and Bitbucket contributions in one unified heatmap. Free, no login required.',
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     offers: {
