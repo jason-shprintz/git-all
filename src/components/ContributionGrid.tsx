@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContributionData } from '@/lib/types';
 
 interface ContributionGridProps {
@@ -49,11 +49,19 @@ function getLevelColor(level: number, colorKey: string): string {
 }
 
 export function ContributionGrid({ data, colorKey }: ContributionGridProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<{
     x: number;
     y: number;
     text: string;
   } | null>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (el) {
+      el.scrollLeft = el.scrollWidth;
+    }
+  }, [data]);
 
   const { weeks, monthHeaders } = useMemo(() => {
     const calendar = data.calendar;
@@ -105,6 +113,7 @@ export function ContributionGrid({ data, colorKey }: ContributionGridProps) {
 
   return (
     <div
+      ref={containerRef}
       className="overflow-x-auto rounded-lg p-4"
       style={{ backgroundColor: 'var(--bg-surface)' }}
     >
