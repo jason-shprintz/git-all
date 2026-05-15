@@ -21,8 +21,7 @@ platform and instantly see combined git activity — no account or login require
 - **GitLab** — gitlab.com (self-hosted and cloud git repositories)
 - **Bitbucket** — bitbucket.org (Atlassian's git collaboration platform)
 - **Gitea** — gitea.com and any self-hosted Gitea instance
-- **Forgejo** — codeberg.org and any self-hosted Forgejo instance
-- **Codeberg** — codeberg.org (a popular Forgejo-based instance, supported by default)
+- **Forgejo** — any self-hosted Forgejo instance (e.g. Codeberg, which is the default)
 
 ---
 
@@ -32,7 +31,7 @@ platform and instantly see combined git activity — no account or login require
 - Merge contributions from all platforms into a single integrated cross-platform heatmap
 - Multi-user comparison — compare contribution activity across multiple developers
 - Custom time ranges — select any date range for contribution analysis
-- Sign in with GitHub OAuth for access to private contribution data
+- Sign in with GitHub OAuth to display your GitHub identity and include your own private GitHub contributions
 - No account required for public contribution data — anonymous lookup supported
 - Free to use, no paid tiers
 - Custom Gitea/Forgejo instance URL support — point to any self-hosted instance
@@ -54,7 +53,7 @@ GitAll proxies platform APIs to avoid CORS restrictions and cache responses:
 - `GET /api/github?username=<user>` — GitHub contribution data
 - `GET /api/gitlab?username=<user>` — GitLab contribution data
 - `GET /api/bitbucket?username=<user>` — Bitbucket contribution data
-- `GET /api/gitea?username=<user>&instance=<url>` — Gitea/Forgejo contribution data
+- `GET /api/gitea?username=<user>&instanceUrl=<url>` — Gitea/Forgejo contribution data
 
 ---
 
@@ -89,7 +88,7 @@ A: Yes. GitAll supports Gitea and Forgejo, including Codeberg. You can also ente
 A: Yes, GitAll is completely free to use.
 
 **Q: Do I need an account?**
-A: No. Public contribution data is fetched anonymously. Sign in with GitHub only if you want to include private contributions.
+A: No. Public contribution data is fetched anonymously — no sign-up, no OAuth required. Sign in with GitHub only to display your GitHub identity and include your own private GitHub contributions in the heatmap.
 
 **Q: How many platforms does GitAll support?**
 A: GitAll supports 4 major platforms: GitHub, GitLab, Bitbucket, and Gitea/Forgejo (including Codeberg).
@@ -101,5 +100,5 @@ A: GitAll supports 4 major platforms: GitHub, GitLab, Bitbucket, and Gitea/Forge
 - Supports 4+ platforms (most competitors only support GitHub + GitLab)
 - Multi-user comparison across all platforms
 - Custom time ranges for contribution analysis
-- OAuth integration for private GitHub contributions
+- OAuth integration to display GitHub identity and include private GitHub contributions for the signed-in user
 - Self-hosted Gitea/Forgejo instance support

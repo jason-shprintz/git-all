@@ -6,6 +6,6 @@ across all major git platforms in one place. Enter usernames to view
 side-by-side or integrated heatmaps. Free, no login required.
 
 Supports: GitHub, GitLab, Bitbucket, Gitea, Forgejo, and Codeberg.
-Sign in with GitHub for multi-user comparison and custom time ranges.
+Sign in with GitHub to display your GitHub identity and include your private GitHub contributions.
 
 Built by Toastbyte Studios (https://toastbyte.studio)
