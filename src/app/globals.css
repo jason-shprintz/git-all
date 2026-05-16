@@ -47,7 +47,7 @@
   --success: #3fb950;
   --gh-btn-bg: #24292f;
   --gh-btn-color: #ffffff;
-  --gh-btn-border: #30363d;
+  --gh-btn-border: var(--border);
 
   /* Contribution levels — GitHub-style greens */
   --level-0: #21262d;
@@ -112,7 +112,6 @@
   --success: #1a7f37;
   --gh-btn-bg: #f6f8fa;
   --gh-btn-color: #24292f;
-  --gh-btn-border: #d0d7de;
 
   --level-0: #ebedf0;
   --level-1: #9be9a8;
@@ -172,7 +171,6 @@
   --success: #3fb950;
   --gh-btn-bg: #24292f;
   --gh-btn-color: #ffffff;
-  --gh-btn-border: #30363d;
 
   --level-0: #21262d;
   --level-1: #0e4429;
@@ -233,7 +231,6 @@
     --success: #1a7f37;
     --gh-btn-bg: #f6f8fa;
     --gh-btn-color: #24292f;
-    --gh-btn-border: #d0d7de;
 
     --level-0: #ebedf0;
     --level-1: #9be9a8;
