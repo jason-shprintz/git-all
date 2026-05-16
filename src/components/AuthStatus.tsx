@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 interface AuthSessionResponse {
   authenticated: boolean;
+  oauthEnabled: boolean;
   user?: {
     login: string;
     avatarUrl: string;
@@ -48,7 +49,7 @@ export function AuthStatus() {
       })
       .catch(() => {
         if (isMounted) {
-          setSession({ authenticated: false });
+          setSession({ authenticated: false, oauthEnabled: false });
         }
       });
 
@@ -58,6 +59,10 @@ export function AuthStatus() {
   }, []);
 
   if (!session) {
+    return null;
+  }
+
+  if (!session.oauthEnabled) {
     return null;
   }
 
