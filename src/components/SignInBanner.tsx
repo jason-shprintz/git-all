@@ -6,15 +6,13 @@ const BANNER_DISMISSED_KEY = 'gitall_signin_banner_dismissed';
 
 interface AuthSessionResponse {
   authenticated: boolean;
-  oauthEnabled: boolean;
 }
 
 export function SignInBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Only show the banner if OAuth is enabled, user is not signed in, and
-    // they haven't already dismissed it.
+    // Show the banner for unauthenticated users who haven't dismissed it.
     let dismissed = false;
     try {
       dismissed = localStorage.getItem(BANNER_DISMISSED_KEY) === 'true';
@@ -27,7 +25,7 @@ export function SignInBanner() {
     fetch('/api/auth/session', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: AuthSessionResponse | null) => {
-        if (data && data.oauthEnabled && !data.authenticated) {
+        if (data && !data.authenticated) {
           setVisible(true);
         }
       })
