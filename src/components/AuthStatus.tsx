@@ -100,6 +100,7 @@ export function AuthStatus() {
         backgroundColor: '#24292f',
         color: '#ffffff',
         textDecoration: 'none',
+        border: '1px solid var(--border)',
       }}
       aria-label="Sign in with GitHub"
     >
