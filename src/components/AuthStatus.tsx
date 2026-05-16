@@ -128,18 +128,14 @@ export function AuthStatus() {
           onDismiss={() => setAuthError(null)}
         />
       )}
+      {/* Dark mode: solid dark button with white text/mark (GitHub standard)
+          Light mode: soft outlined button with dark text/mark (less heavy) */}
       <a
         href="/api/auth/github"
-        className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90"
-        style={{
-          backgroundColor: '#24292f',
-          color: '#ffffff',
-          textDecoration: 'none',
-          border: '1px solid var(--border)',
-        }}
+        className="gh-sign-in-btn inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90"
         aria-label="Sign in with GitHub"
       >
-        <GitHubMark color="#ffffff" />
+        <GitHubMark />
         Sign in with GitHub
       </a>
     </div>
