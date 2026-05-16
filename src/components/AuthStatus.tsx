@@ -5,12 +5,22 @@ import { useEffect, useState } from 'react';
 
 interface AuthSessionResponse {
   authenticated: boolean;
-  oauthEnabled: boolean;
   user?: {
     login: string;
     avatarUrl: string;
   };
 }
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  oauth_not_configured: 'GitHub sign-in is not configured for this deployment.',
+  invalid_state: 'Sign-in failed: session state mismatch. Please try again.',
+  token_exchange_failed:
+    'Sign-in failed: could not exchange token with GitHub.',
+  user_fetch_failed: 'Sign-in failed: could not retrieve your GitHub profile.',
+  invalid_user_data: 'Sign-in failed: invalid user data from GitHub.',
+  session_create_failed: 'Sign-in failed: could not create your session.',
+  oauth_callback_failed: 'Sign-in failed: unexpected error. Please try again.',
+};
 
 /** The official GitHub Invertocat mark SVG. Used white on dark backgrounds,
  *  dark (#24292f) on light backgrounds per GitHub logo guidelines. */
@@ -31,6 +41,19 @@ function GitHubMark({ color = 'currentColor' }: { color?: string }) {
 
 export function AuthStatus() {
   const [session, setSession] = useState<AuthSessionResponse | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Read and clear any auth error from the URL (set by the OAuth routes on failure).
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('auth_error');
+    if (error) {
+      setAuthError(error);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('auth_error');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,7 +72,7 @@ export function AuthStatus() {
       })
       .catch(() => {
         if (isMounted) {
-          setSession({ authenticated: false, oauthEnabled: false });
+          setSession({ authenticated: false });
         }
       });
 
@@ -58,15 +81,20 @@ export function AuthStatus() {
     };
   }, []);
 
+  const errorMessage = authError
+    ? (AUTH_ERROR_MESSAGES[authError] ?? 'Sign-in failed. Please try again.')
+    : null;
+
   if (!session) {
-    return null;
+    return errorMessage ? (
+      <AuthErrorNotice
+        message={errorMessage}
+        onDismiss={() => setAuthError(null)}
+      />
+    ) : null;
   }
 
-  if (!session.oauthEnabled) {
-    return null;
-  }
-
-  if (session?.authenticated && session.user) {
+  if (session.authenticated && session.user) {
     return (
       <div className="flex items-center gap-2 text-xs">
         <Image
@@ -93,19 +121,59 @@ export function AuthStatus() {
   }
 
   return (
-    <a
-      href="/api/auth/github"
-      className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90"
+    <div className="flex flex-col items-center gap-2">
+      {errorMessage && (
+        <AuthErrorNotice
+          message={errorMessage}
+          onDismiss={() => setAuthError(null)}
+        />
+      )}
+      <a
+        href="/api/auth/github"
+        className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90"
+        style={{
+          backgroundColor: '#24292f',
+          color: '#ffffff',
+          textDecoration: 'none',
+          border: '1px solid var(--border)',
+        }}
+        aria-label="Sign in with GitHub"
+      >
+        <GitHubMark color="#ffffff" />
+        Sign in with GitHub
+      </a>
+    </div>
+  );
+}
+
+function AuthErrorNotice({
+  message,
+  onDismiss,
+}: {
+  message: string;
+  onDismiss: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs"
       style={{
-        backgroundColor: '#24292f',
-        color: '#ffffff',
-        textDecoration: 'none',
+        backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border)',
+        color: 'var(--text-secondary)',
       }}
-      aria-label="Sign in with GitHub"
     >
-      <GitHubMark color="#ffffff" />
-      Sign in with GitHub
-    </a>
+      <span aria-hidden="true">⚠️</span>
+      <span>{message}</span>
+      <button
+        type="button"
+        onClick={onDismiss}
+        aria-label="Dismiss error"
+        className="ml-1 cursor-pointer bg-transparent border-0 p-0 leading-none hover:opacity-70 transition-opacity"
+        style={{ color: 'var(--text-muted)' }}
+      >
+        ✕
+      </button>
+    </div>
   );
 }

@@ -6,7 +6,6 @@ const BANNER_DISMISSED_KEY = 'gitall_signin_banner_dismissed';
 
 interface AuthSessionResponse {
   authenticated: boolean;
-  oauthEnabled: boolean;
 }
 
 export function SignInBanner() {
@@ -26,7 +25,7 @@ export function SignInBanner() {
     fetch('/api/auth/session', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: AuthSessionResponse | null) => {
-        if (data && data.oauthEnabled && !data.authenticated) {
+        if (data && !data.authenticated) {
           setVisible(true);
         }
       })
